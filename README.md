@@ -23,6 +23,7 @@ At the current state, this project:
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
 
 ## Instructions
+Simply put the ```index.php``` file into ```/var/www/html/```
 
 ### Setup
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
@@ -34,10 +35,11 @@ Your raspberry will be the sole agent in this, any other device will merely be a
 ```apache```
 ```php```
 
+
 ### Config
 The `/etc/sudoers` file needs to have a few additions, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
 
-***Note*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
+***NOTE*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
 
 ***BE AWARE!*** you might break your sudo access if you're not careful with this file, either copy-paste or look carefully before saving.
 
@@ -48,3 +50,29 @@ The `/etc/sudoers` file needs to have a few additions, this is to allow command 
 ```
 
 ### PHP/Apache
+Here's the three commands that we allowed in the sudoers. PHP will call these on the raspberry depending on the button pressed in the HTML.
+
+```php
+...
+$cmd = "sudo killall mpv; sudo mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\"".$_POST["query"]."\" & disown;";
+// $proc = popen($cmd, 'r');
+...
+$exec = shell_exec('sudo killall mpv');
+...
+$exec = shell_exec('sudo shutdown now');
+...
+```
+
+### MPV
+```
+mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\""Search String (E.g. 'Daft Punk - Around The World')"\"
+```
+***NOTE*** your audio card might be different. This is using the Raspberry Pi Model A+. (Find your device with ```aplay -L``` and test with ```speaker-test```)
+
+
+### Conclusion
+If everything works as it should, then upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal.
+
+<p align="center">
+  <img width="460" src="https://user-images.githubusercontent.com/14123880/181582513-b67a50a7-20b7-4af9-ba25-e601cedff895.png">
+</p>
