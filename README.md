@@ -32,14 +32,24 @@ Your raspberry will be the sole agent in this, any other device will merely be a
 ### Setup
 Simply put the ```index.php``` file into ```/var/www/html/```
 
-And follow the [Config section](#config) for sudoers config additions.
+And follow the [Packages section](#packages) & [Config section](#config) for sudoers config additions.
 
+<a name="packages"></a>
 ### Packages
+The following packages are required for the system to work
 ```mpv```
 ```youtube-dl (Through pip3, apt is outdated)```
 ```python3-pip```
 ```apache```
 ```php```
+
+This can be done with:
+
+```sudo apt install mpv python3-pip php```
+
+Then, using pip:
+
+```(sudo) pip3 install youtube-dl```
 
 <a name="config"></a>
 ### Config
@@ -54,6 +64,8 @@ The `/etc/sudoers` file needs to have a few additions, this is to allow command 
 
 %www-data ALL=NOPASSWD:/bin/mpv,/bin/speaker-test,/bin/killall,/sbin/shutdown
 ```
+
+That's it! Everything should work now and you should see a webpage when accessing the ip of your Pi on your network.
 
 ## Commands and arguments
 
