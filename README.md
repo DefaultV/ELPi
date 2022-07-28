@@ -1,5 +1,9 @@
 # MPV-berryPi
 Using youtube-dl and MPV, host your own free audio streaming service locally on the raspberry pi.
+<p align="center">
+  <img width="128" src="https://user-images.githubusercontent.com/14123880/181585837-949ee72f-4dc1-45e8-84cb-100bd03bd131.png">
+</p>
+<br>
 
 ## Why would I want this? (And why I made this project)
 If you want a free, easy to use audio streaming service, seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify, then this project might be for you!
