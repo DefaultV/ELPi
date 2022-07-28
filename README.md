@@ -75,8 +75,11 @@ mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:
 
 
 ## Conclusion
-If everything works as it should, then upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal.
+If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal.
 
 <p align="center">
   <img width="460" src="https://user-images.githubusercontent.com/14123880/181582513-b67a50a7-20b7-4af9-ba25-e601cedff895.png">
 </p>
+
+# IMPORTANT
+Do not host this publically to the rest of the internet, the system is vulnerable to format string attacks and exposes both the terminal and multiple commands which should only be used by admins of the system. ONLY USE ON YOUR LOCAL NETWORK
