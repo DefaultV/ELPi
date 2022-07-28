@@ -29,14 +29,15 @@ At the current state, this project:
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
 
-### Setup
+### 1. Setup
 Simply put the ```index.php``` file into ```/var/www/html/```
 
 And follow the [Packages section](#packages) & [Config section](#config) for sudoers config additions.
 
 <a name="packages"></a>
-### Packages
+### 2. Packages
 The following packages are required for the system to work
+
 ```mpv```
 ```youtube-dl (Through pip3, apt is outdated)```
 ```python3-pip```
@@ -52,7 +53,7 @@ Then, using pip:
 ```(sudo) pip3 install youtube-dl```
 
 <a name="config"></a>
-### Config
+### 3. Config
 The `/etc/sudoers` file needs to have a few additions, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
 
 ***NOTE*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
