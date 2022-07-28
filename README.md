@@ -25,6 +25,8 @@ At the current state, this project:
 ## Instructions
 Simply put the ```index.php``` file into ```/var/www/html/```
 
+And follow the [Config section](#config) for suoders config additions.
+
 ### Setup
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
 
@@ -35,7 +37,7 @@ Your raspberry will be the sole agent in this, any other device will merely be a
 ```apache```
 ```php```
 
-
+<a name="config"></a>
 ### Config
 The `/etc/sudoers` file needs to have a few additions, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
 
