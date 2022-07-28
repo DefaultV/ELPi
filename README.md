@@ -23,12 +23,12 @@ At the current state, this project:
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
 
 ## Instructions
-Simply put the ```index.php``` file into ```/var/www/html/```
-
-And follow the [Config section](#config) for suoders config additions.
+Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
 
 ### Setup
-Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
+Simply put the ```index.php``` file into ```/var/www/html/```
+
+And follow the [Config section](#config) for sudoers config additions.
 
 ### Packages
 ```mpv```
@@ -51,6 +51,8 @@ The `/etc/sudoers` file needs to have a few additions, this is to allow command 
 %www-data ALL=NOPASSWD:/bin/mpv,/bin/speaker-test,/bin/killall,/sbin/shutdown
 ```
 
+## Commands and arguments
+
 ### PHP/Apache
 Here's the three commands that we allowed in the sudoers. PHP will call these on the raspberry depending on the button pressed in the HTML.
 
@@ -72,7 +74,7 @@ mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:
 ***NOTE*** your audio card might be different. This is using the Raspberry Pi Model A+. (Find your device with ```aplay -L``` and test with ```speaker-test```)
 
 
-### Conclusion
+## Conclusion
 If everything works as it should, then upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal.
 
 <p align="center">
