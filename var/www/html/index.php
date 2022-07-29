@@ -105,30 +105,28 @@
       if(isset($_POST["search"])){
 	      echo "<div>Playing ".$_POST["query"]."</div>";
 	      
-        $cmd = "sudo killall mpv; sudo mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\"".$_POST["query"]."\" & disown;";
-	      while (@ ob_end_flush());
-        $proc = popen($cmd, 'r');
-
-        echo '<div class="verbatim">';
-
-        while (!feof($proc))
-        {
-          echo '<div>'.fread($proc, 4096).'</div>';
-          @ flush();
-        }
-
-        echo '</div>';
+        $cmd = "sudo killall mpv; sudo mpv --profile=360p --reset-on-next-file=all --no-osc --demuxer-readahead-secs=3 --demuxer-max-bytes=20MiB --demuxer-max-back-bytes=10MiB --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\"".$_POST["query"]."\" > /var/www/html/out.log &";
+        $exec = shell_exec($cmd);
+        echo $exec;
+        header('location: ' . $_SERVER['PHP_SELF']);
       }
     
       if (isset($_POST["reset"])){
         $exec = shell_exec('sudo killall mpv');
         echo $exec;
+        header('location: ' . $_SERVER['PHP_SELF']);
       }
       
       if (isset($_POST["shutdown"])){
         echo "Shutting down...";
         $exec = shell_exec('sudo shutdown now');
+        header('location: ' . $_SERVER['PHP_SELF']);
       }
+
+      echo '<div class="verbatim">';
+      $exec = shell_exec("tail -n 5 /var/www/html/out.log");
+      echo $exec;
+      echo '</div>';
 
     ?>
     </div>
