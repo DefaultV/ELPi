@@ -26,6 +26,8 @@ At the current state, this project:
 * Either take the first result of a given youtube search string or directly play a "video", given a URL
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
 
+Some values or arguments might differ from Pi to Pi, like the jack audio card in the [MPV section](#mpv). This project has only been tested on a Raspberry Pi A+
+
 ##### Current Issues
 Check out the [Issues](https://github.com/DefaultV/mpvberrypi/issues)
 
@@ -57,7 +59,9 @@ Then, using pip:
 
 <a name="config"></a>
 ### 3. Config
-The `/etc/sudoers` file needs to have a few additions, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
+The MPV config file can be left out if necessary, it's only used to reduce memory consumption.
+
+The `/etc/sudoers` file needs to have an addition, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
 
 ***NOTE*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
 
@@ -86,20 +90,21 @@ $exec = shell_exec('sudo killall mpv');
 $exec = shell_exec('sudo shutdown now');
 ...
 ```
-
+<a name="mpv"></a>
 ### MPV
 ```
-mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\""Search String (E.g. 'Daft Punk - Around The World')"\"
+mpv --no-video --EXTRA-ARGS --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\""Search String (E.g. 'Daft Punk - Around The World')"\"
 ```
 ***NOTE*** your audio card might be different. This is using the Raspberry Pi Model A+. (Find your device with ```aplay -L``` and test with ```speaker-test```)
 
 
 ## Conclusion
-If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal.
+If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal upon refreshing the page.
 
 <p align="center">
-  <img width="460" src="https://user-images.githubusercontent.com/14123880/181582513-b67a50a7-20b7-4af9-ba25-e601cedff895.png">
+  <img width="500" src="https://user-images.githubusercontent.com/14123880/181741565-3d05e8f3-d303-41b6-87c8-01933f1ba699.png">
 </p>
+
 
 # IMPORTANT
 Do not host this publicly to the rest of the internet, the system is vulnerable to format string attacks and exposes both the terminal and multiple commands which should only be used by admins of the system. ONLY USE ON YOUR LOCAL NETWORK
