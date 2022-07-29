@@ -37,6 +37,12 @@ Your raspberry will be the sole agent in this, any other device will merely be a
 ### 1. Setup
 Simply put the ```index.php``` file into ```/var/www/html/```
 
+Manually create a ```out.log``` in the ```/var/www/html/``` folder, then chmod 666 for all access.
+
+```
+sudo touch /var/www/html/out.log; sudo chmod 666 /var/www/html/out.log
+```
+
 And follow the [Packages section](#packages) & [Config section](#config) for sudoers config additions.
 
 <a name="packages"></a>
@@ -51,11 +57,15 @@ The following packages are required for the system to work
 
 This can be done with:
 
-```sudo apt install mpv python3-pip php```
+```
+sudo apt install mpv python3-pip php
+```
 
 Then, using pip:
 
-```(sudo) pip3 install youtube-dl```
+```
+(sudo) pip3 install youtube-dl
+```
 
 <a name="config"></a>
 ### 3. Config
