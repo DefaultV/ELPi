@@ -27,8 +27,7 @@ At the current state, this project:
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
 
 ##### Current Issues
-* ```[ao/alsa] ALSA XRUN hit, attempting to recover...```
-* Freezing and/or stuttering on long "videos"
+Check out the [Issues](https://github.com/DefaultV/mpvberrypi/issues)
 
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
