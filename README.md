@@ -1,5 +1,5 @@
 # MPV-berryPi
-Using youtube-dl and MPV, host your own free audio streaming service locally on the raspberry pi.
+Using youtube-dl and MPV, host your own free audio streaming service locally on the Raspberry Pi.
 <p align="center">
   <img width="128" src="https://user-images.githubusercontent.com/14123880/181585837-949ee72f-4dc1-45e8-84cb-100bd03bd131.png">
 </p>
@@ -9,14 +9,14 @@ Using youtube-dl and MPV, host your own free audio streaming service locally on 
 If you want a free, easy to use audio streaming service, seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify, then this project might be for you!
 
 ```
-- Doesn't require bluetooth
+- Doesn't require Bluetooth
 - Doesn't require HDMI
 - Doesn't require an app
-- Doesn't require linking a separate service
+- Doesn't require linking separate services
 - Doesn't require any accounts (or paid accounts)
 ```
 ```
-- Only requires a local network, a Raspberry Pi and some speakers
+- Requires a local network, a Raspberry Pi and some speakers
 ```
 
 A good DIY project to tinker with, and even better, you can host this alongside all the different things you otherwise use the Pi for, e.g. retropie, without needing to mess with configs or flashing.
@@ -25,6 +25,10 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 At the current state, this project:
 * Either take the first result of a given youtube search string or directly play a "video", given a URL
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
+
+##### Current Issues
+* ```[ao/alsa] ALSA XRUN hit, attempting to recover...```
+* Freezing and/or stuttering on long "videos"
 
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
@@ -99,4 +103,4 @@ If everything works as it should, then navigating to the local website and upon 
 </p>
 
 # IMPORTANT
-Do not host this publically to the rest of the internet, the system is vulnerable to format string attacks and exposes both the terminal and multiple commands which should only be used by admins of the system. ONLY USE ON YOUR LOCAL NETWORK
+Do not host this publicly to the rest of the internet, the system is vulnerable to format string attacks and exposes both the terminal and multiple commands which should only be used by admins of the system. ONLY USE ON YOUR LOCAL NETWORK
