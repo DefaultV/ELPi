@@ -6,7 +6,7 @@ Using youtube-dl and MPV, host your own free audio streaming service locally on 
 <br>
 
 ## Why would I want this? (And why I made this project)
-If you want a free, easy to use audio streaming service, seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify, then this project might be for you!
+If you want a free, easy to use audio streaming service (and without ads!), seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify, then this project might be for you!
 
 ```
 - Doesn't require Bluetooth
