@@ -1,7 +1,8 @@
 # MPV-berryPi
 Using youtube-dl and MPV, host your own free audio streaming service locally on the Raspberry Pi.
+
 <p align="center">
-  <img width="128" src="https://user-images.githubusercontent.com/14123880/181585837-949ee72f-4dc1-45e8-84cb-100bd03bd131.png">
+  <img width="128" src="https://user-images.githubusercontent.com/14123880/183255390-3b86f98b-79e1-4f9c-9e16-1158bed51f75.png">
 </p>
 <br>
 
