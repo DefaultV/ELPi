@@ -1,4 +1,4 @@
-# ELPi
+# ELPi :notes:
 Using youtube-dl and MPV, host your own free audio streaming service locally on the Raspberry Pi.
 
 <p align="center">
@@ -6,8 +6,8 @@ Using youtube-dl and MPV, host your own free audio streaming service locally on 
 </p>
 <br>
 
-## Why would I want this? (And why I made this project)
-If you want a free, easy to use audio streaming service (and without ads!), seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify, then this project might be for you!
+## Why would I want this? (And why I made this project) :thinking:
+If you want a free, easy to use audio streaming service (and without ads!), seeking an alternative to expensive surround sound systems being tethered to restrictive apps. Or just want a free alternative to audio services like Spotify. Sounds too good to be true? Then this project might be for you!
 
 ```
 - Doesn't require Bluetooth
@@ -22,7 +22,7 @@ If you want a free, easy to use audio streaming service (and without ads!), seek
 
 A good DIY project to tinker with, and even better, you can host this alongside all the different things you otherwise use the Pi for, e.g. retropie, without needing to mess with configs or flashing.
 
-##### Disclaimer
+##### Disclaimer :triangular_flag_on_post:
 At the current state, this project:
 * Either take the first result of a given youtube search string or directly play a "video", given a URL
 * Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
@@ -34,6 +34,8 @@ Check out the [Issues](https://github.com/DefaultV/mpvberrypi/issues)
 
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
+
+As simple as 1, 2, 3!
 
 ### 1. Setup
 Simply put the ```index.php``` file into ```/var/www/html/```
@@ -76,7 +78,7 @@ The `/etc/sudoers` file needs to have an addition, this is to allow command call
 
 ***NOTE*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
 
-***BE AWARE!*** you might break your sudo access if you're not careful with this file, either copy-paste or look carefully before saving.
+:exclamation: ***BE AWARE!*** you might break your sudo access if you're not careful with this file, either copy-paste or look carefully before saving.
 
 ```
 ...
