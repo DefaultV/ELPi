@@ -75,6 +75,27 @@ sudo node dist/server.js
 
 That's it! Everything should work now and you should see a webpage when accessing the ip of your Pi on your network.
 
+## Startup
+If you want, you can run the application on startup. If you are using systemd you can achieve this the following way:
+
+`elpi.sh`
+```
+#!/bin/bash
+cd /home/pi/ELPi/; sudo node dist/server.min.js
+```
+
+Systemd file
+```
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/home/pi/ELPi/elpi.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
+```
+
 ## Conclusion
 If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field.
 
