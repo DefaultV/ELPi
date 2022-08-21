@@ -1,0 +1,31 @@
+<html>
+
+<head>
+  <title>ELPi</title>
+  <link rel="icon" type="image/x-icon" href="res/elpi_logo.png">
+  <link rel="stylesheet" href="res/style.css">
+</head>
+
+<body>
+  <div class="content-top">
+    <div style="min-width: 400px;">
+      <div id="inputform">
+        <input id="queryinput" type="text" name="query" placeholder="Youtube Search & Play">
+        <div class="flex-center">
+          <button id="play"><img src="res/elpi_play.png" /></button>
+          <button id="stop"><img src="res/elpi_stop.png" /></button>
+          <button id="shutdown">Power off</button>
+        </div>
+      </div>
+      <div class="search-response" />
+      <div id="loader" class="loader"></div>
+      <div id="status" class="verbatim"></div>
+      <div id="history" class="history"></div>
+    </div>
+  </div>
+  <img src="res/elpi_logo.png" width="150px" />
+</body>
+
+<script src="client.js"></script>
+
+</html>
