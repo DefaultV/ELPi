@@ -38,30 +38,19 @@ Your raspberry will be the sole agent in this, any other device will merely be a
 As simple as 1, 2, 3!
 
 ### 1. Setup
-Simply put the ```index.php``` file into ```/var/www/html/```
-
-Manually create a ```out.log``` in the ```/var/www/html/``` folder, then chmod 666 for all access.
-
-```
-sudo touch /var/www/html/out.log; sudo chmod 666 /var/www/html/out.log
-```
-
-And follow the [Packages section](#packages) & [Config section](#config) for sudoers config additions.
 
 <a name="packages"></a>
 ### 2. Packages
 The following packages are required for the system to work
 
 ```mpv```
-```youtube-dl (Through pip3, apt is outdated)```
 ```python3-pip```
-```apache```
-```php```
+```youtube-dl (Through pip3, apt is outdated)```
 
 This can be done with:
 
 ```
-sudo apt install mpv python3-pip php
+sudo apt install mpv python3-pip
 ```
 
 Then, using pip:
@@ -70,46 +59,22 @@ Then, using pip:
 (sudo) pip3 install youtube-dl
 ```
 
-<a name="config"></a>
-### 3. Config
-The MPV config file can be left out if necessary, it's only used to reduce memory consumption.
+Either clone the repo or download one of the releases.
 
-The `/etc/sudoers` file needs to have an addition, this is to allow command calls from PHP. You can leave out the /bin/speaker-test, it's only used for testing since youtube-dl can be a tad slow occasionally. 
-
-***NOTE*** that the shutdown is in ```/sbin/``` and not ```/bin/``` and that there's no spaces between the commands!
-
-:exclamation: ***BE AWARE!*** you might break your sudo access if you're not careful with this file, either copy-paste or look carefully before saving.
+#### Release setup
+After downloading a release, unzip and run the following command
 
 ```
-...
+sudo node dist/server.min.js
+```
 
-%www-data ALL=NOPASSWD:/bin/mpv,/bin/speaker-test,/bin/killall,/sbin/shutdown
+#### Repo setup
+Clone the repo and run `tsc`, then after compilation you can run the command
+```
+sudo node dist/server.js
 ```
 
 That's it! Everything should work now and you should see a webpage when accessing the ip of your Pi on your network.
-
-## Commands and arguments
-
-### PHP/Apache
-Here's the three commands that we allowed in the sudoers. PHP will call these on the raspberry depending on the button pressed in the HTML.
-
-```php
-...
-$cmd = "sudo killall mpv; sudo mpv --no-video --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\"".$_POST["query"]."\" & disown;";
-// $proc = popen($cmd, 'r');
-...
-$exec = shell_exec('sudo killall mpv');
-...
-$exec = shell_exec('sudo shutdown now');
-...
-```
-<a name="mpv"></a>
-### MPV
-```
-mpv --no-video --EXTRA-ARGS --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:\""Search String (E.g. 'Daft Punk - Around The World')"\"
-```
-***NOTE*** your audio card might be different. This is using the Raspberry Pi Model A+. (Find your device with ```aplay -L``` and test with ```speaker-test```)
-
 
 ## Conclusion
 If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal upon refreshing the page.
