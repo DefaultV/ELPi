@@ -79,7 +79,7 @@ That's it! Everything should work now and you should see a webpage when accessin
 If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal upon refreshing the page.
 
 <p align="center">
-  <img width="500" src="https://user-images.githubusercontent.com/14123880/181741565-3d05e8f3-d303-41b6-87c8-01933f1ba699.png">
+  <img width="500" src="https://user-images.githubusercontent.com/14123880/185797208-f70c50b4-02ef-47b1-907a-d7dee0510652.png">
 </p>
 
 
