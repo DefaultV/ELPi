@@ -35,12 +35,10 @@ Check out the [Issues](https://github.com/DefaultV/mpvberrypi/issues)
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
 
-As simple as 1, 2, 3!
-
-### 1. Setup
+As simple as 1, 2!
 
 <a name="packages"></a>
-### 2. Packages
+### 1. Packages
 The following packages are required for the system to work
 
 ```mpv```
@@ -59,6 +57,7 @@ Then, using pip:
 (sudo) pip3 install youtube-dl
 ```
 
+### 2. Setup
 Either clone the repo or download one of the releases.
 
 #### Release setup
