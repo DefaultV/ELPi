@@ -76,7 +76,7 @@ sudo node dist/server.js
 That's it! Everything should work now and you should see a webpage when accessing the ip of your Pi on your network.
 
 ## Conclusion
-If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field, a small dialogue box should show stating the output of MPV from the terminal upon refreshing the page.
+If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field.
 
 <p align="center">
   <img width="500" src="https://user-images.githubusercontent.com/14123880/185797208-f70c50b4-02ef-47b1-907a-d7dee0510652.png">
