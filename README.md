@@ -78,13 +78,13 @@ That's it! Everything should work now and you should see a webpage when accessin
 ## Startup
 If you want, you can run the application on startup. If you are using systemd you can achieve this the following way:
 
-`elpi.sh`
+`/home/pi/ELPi/elpi.sh`
 ```
 #!/bin/bash
 cd /home/pi/ELPi/; sudo node dist/server.min.js
 ```
 
-Systemd file
+`/etc/systemd/system/elpi.service`
 ```
 [Service]
 Type=simple
@@ -94,6 +94,11 @@ TimeoutStartSec=0
 
 [Install]
 WantedBy=default.target
+```
+
+Then to enable on boot
+```
+systemctl enable elpi && systemctl start elpi
 ```
 
 ## Conclusion
