@@ -4,7 +4,7 @@ interface IMPVStreamInfo {
   videoUrl?: string;
   searchQuery?: string;
 }
-const socket = new WebSocket("ws://127.0.0.1:8080");
+const socket = new WebSocket(`ws://${location.host}:443`);
 const inputField: HTMLInputElement = document.getElementById(
   "queryinput"
 ) as HTMLInputElement;

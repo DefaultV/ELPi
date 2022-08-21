@@ -4,9 +4,9 @@ import WebSocket, { WebSocketServer } from "ws";
 import * as path from "path";
 import { appendFile, readFile } from "fs";
 
-const wssPort = 8080;
+const wssPort = 443;
 const wss = new WebSocketServer({ port: wssPort });
-const port = 3000;
+const port = 80;
 const app = express();
 
 interface IMPVStreamInfo {
