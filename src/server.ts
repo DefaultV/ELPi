@@ -30,9 +30,12 @@ const startMPVStream = (searchquery: string) => {
 
   MPVStatus({ status: "searching", searchQuery: searchquery });
   addQueryToHistory(searchquery);
-  mpv_process = spawn(`mpv --no-video ytdl://ytsearch:'${searchquery}'`, {
-    shell: true,
-  });
+  mpv_process = spawn(
+    `mpv --no-video -no-osc --reset-on-next-file=all --demuxer-readahead-secs=3 --demuxer-max-bytes=20MiB --demuxer-max-back-bytes=10MiB --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:'${searchquery}'`,
+    {
+      shell: "/bin/bash",
+    }
+  );
 
   mpv_process.stdout?.on("data", (data) => {
     handleStreamOut(data.toString());
@@ -68,9 +71,7 @@ const killMPVStream = () => {
     metadata: undefined,
   });
   if (!mpv_process) return;
-  if (!mpv_process.killed) {
-    mpv_process.kill();
-  }
+  mpv_process.kill();
 };
 
 const handleStreamOut = (data: string) => {
