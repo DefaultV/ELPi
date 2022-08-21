@@ -4,7 +4,7 @@ import WebSocket, { WebSocketServer } from "ws";
 import * as path from "path";
 import { appendFile, readFile } from "fs";
 
-const wssPort = 443;
+const wssPort = 8080;
 const wss = new WebSocketServer({ port: wssPort });
 const port = 80;
 const app = express();
