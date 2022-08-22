@@ -41,6 +41,7 @@ As simple as 1, 2!
 ### 1. Packages
 The following packages are required for the system to work
 
+```node```
 ```mpv```
 ```python3-pip```
 ```youtube-dl (Through pip3, apt is outdated)```
@@ -48,7 +49,7 @@ The following packages are required for the system to work
 This can be done with:
 
 ```
-sudo apt install mpv python3-pip
+sudo apt install mpv python3-pip nodejs
 ```
 
 Then, using pip:
@@ -56,6 +57,8 @@ Then, using pip:
 ```
 (sudo) pip3 install youtube-dl
 ```
+
+For better performance, make sure `nodejs` is somewhat the latest version, the apt version is 10.x
 
 ### 2. Setup
 Either clone the repo or download one of the releases.
