@@ -24,9 +24,7 @@ const connectionList: WebSocket[] = [];
 const history: string[] = [];
 
 const startMPVStream = (searchquery: string) => {
-  if (mpv_process) {
-    killMPVStream();
-  }
+  killMPVStream();
 
   MPVStatus({ status: "searching", searchQuery: searchquery });
   addQueryToHistory(searchquery);
@@ -58,8 +56,13 @@ const startMPVStream = (searchquery: string) => {
     }
   });
 
-  mpv_process.on("close", (code) => {
-    killMPVStream();
+  mpv_process.on("exit", () => {
+    MPVStatus({
+      status: "idle",
+      searchQuery: undefined,
+      videoUrl: undefined,
+      metadata: undefined,
+    });
   });
 };
 
