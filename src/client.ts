@@ -53,7 +53,9 @@ function isMPVStreamInfo(
 }
 
 const populateHistory = (items: string[]) => {
+  const newItems: HTMLDivElement[] = [];
   const uniqueHistory = new Set(items);
+
   uniqueHistory.forEach((item) => {
     if (item.length <= 0) return;
     const historyItem = document.createElement("div");
@@ -63,8 +65,10 @@ const populateHistory = (items: string[]) => {
       inputField.value = item;
     });
 
-    historyElement.appendChild(historyItem);
+    newItems.push(historyItem);
   });
+
+  historyElement.replaceChildren(...newItems);
 };
 
 // Listen for messages

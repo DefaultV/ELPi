@@ -119,6 +119,7 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
     switch (msgType) {
       case "play":
         if (msgContent && msgContent?.length > 1) startMPVStream(msgContent);
+        sendHistoryToSocket(connection);
         break;
       case "status":
         connection.send(JSON.stringify(MPVStatus()));
@@ -127,13 +128,17 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
         killMPVStream();
         break;
       case "history":
-        connection.send(JSON.stringify(history));
+        sendHistoryToSocket(connection);
         break;
       case "shutdown":
         exec("shutdown now");
         break;
     }
   });
+};
+
+const sendHistoryToSocket = (connection: WebSocket) => {
+  connection.send(JSON.stringify(history));
 };
 
 const addQueryToHistory = (query: string) => {
