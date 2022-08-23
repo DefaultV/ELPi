@@ -20,13 +20,13 @@ const historyElement: HTMLDivElement = document.getElementById(
 const stopElement: HTMLButtonElement = document.getElementById(
   "stop"
 ) as HTMLButtonElement;
-document.getElementById("play")?.addEventListener("pointerdown", () => {
+document.getElementById("play")?.addEventListener("click", () => {
   sendWSQuery(inputField.value);
 });
-stopElement?.addEventListener("pointerdown", () => {
+stopElement?.addEventListener("click", () => {
   SendWSKill();
 });
-document.getElementById("shutdown")?.addEventListener("pointerdown", () => {
+document.getElementById("shutdown")?.addEventListener("click", () => {
   sendWSShutdown();
 });
 
@@ -61,7 +61,7 @@ const populateHistory = (items: string[]) => {
     const historyItem = document.createElement("div");
     historyItem.classList.add("history-item");
     historyItem.innerHTML = item;
-    historyItem.addEventListener("pointerdown", () => {
+    historyItem.addEventListener("click", () => {
       inputField.value = item;
     });
 
