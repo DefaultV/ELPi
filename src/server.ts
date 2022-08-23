@@ -129,6 +129,9 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
       case "history":
         connection.send(JSON.stringify(history));
         break;
+      case "shutdown":
+        exec("shutdown now");
+        break;
     }
   });
 };
