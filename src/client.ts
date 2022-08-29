@@ -20,8 +20,20 @@ const historyElement: HTMLDivElement = document.getElementById(
 const stopElement: HTMLButtonElement = document.getElementById(
   "stop"
 ) as HTMLButtonElement;
-document.getElementById("play")?.addEventListener("click", () => {
+const playElement: HTMLButtonElement = document.getElementById(
+  "play"
+) as HTMLButtonElement;
+const pauseElement: HTMLButtonElement = document.getElementById(
+  "pause"
+) as HTMLButtonElement;
+document.getElementById("search")?.addEventListener("click", () => {
   sendWSQuery(inputField.value);
+});
+playElement?.addEventListener("click", () => {
+  sendWSPause(false);
+});
+pauseElement?.addEventListener("click", () => {
+  sendWSPause(true);
 });
 stopElement?.addEventListener("click", () => {
   SendWSKill();
@@ -45,6 +57,12 @@ const sendWSStatus = () => {
 const sendWSHistory = () => {
   socket.send("history:all");
 };
+const sendWSPause = (pause: boolean) => {
+  socket.send(`pause:${pause}`);
+};
+const sendWSIndex = (index: number) => {
+  socket.send(`index:${index}`);
+};
 
 function isMPVStreamInfo(
   info: IMPVStreamInfo | string[]
@@ -63,6 +81,7 @@ const populateHistory = (items: string[]) => {
     historyItem.innerHTML = item;
     historyItem.addEventListener("click", () => {
       inputField.value = item;
+      sendWSQuery(item);
     });
 
     newItems.push(historyItem);
@@ -84,9 +103,11 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
   const isLoading = info.status == "buffering" || info.status == "searching";
   const searchQuery = info.searchQuery ? info.searchQuery : "";
   const videoUrl = info.videoUrl
-    ? `${info.status == "playing" ? `(${searchQuery})<br>` : ""}${
-        info.videoUrl
-      }`
+    ? `${
+        info.status == "playing" || info.status == "paused"
+          ? `(${searchQuery})<br>`
+          : ""
+      }${info.videoUrl}`
     : "";
 
   let videoIndex: string = "";
@@ -107,6 +128,8 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
 
   specifyClassList(isLoading, loadingElement, "active");
   specifyClassList(info.status != "idle", stopElement, "active");
+  specifyClassList(info.status == "paused", playElement, "active");
+  specifyClassList(info.status == "playing", pauseElement, "active");
 };
 
 const specifyClassList = (

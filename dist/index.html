@@ -10,10 +10,14 @@
   <div class="content-top">
     <div style="min-width: 400px;">
       <div id="inputform">
-        <input id="queryinput" type="text" name="query" placeholder="Youtube Search & Play">
+        <div id="querysearch">
+          <input id="queryinput" type="text" name="query" placeholder="Search & Play">
+          <button id="search"><img src="res/elpi_search.png" /></button>
+        </div>
         <div class="flex-center">
-          <button id="play"><img src="res/elpi_play.png" /></button>
-          <button id="stop"><img src="res/elpi_stop.png" /></button>
+          <button class="ibutton" id="play"><img src="res/elpi_play.png" /></button>
+          <button class="ibutton" id="pause"><img src="res/elpi_pause.png" /></button>
+          <button class="ibutton" id="stop"><img src="res/elpi_stop.png" /></button>
           <button id="shutdown">Power off</button>
         </div>
       </div>

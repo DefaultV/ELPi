@@ -29,7 +29,7 @@ const startMPVStream = (searchquery: string) => {
   MPVStatus({ status: "searching", searchQuery: searchquery });
   addQueryToHistory(searchquery);
   mpv_process = spawn(
-    `mpv --no-video -no-osc --reset-on-next-file=all --demuxer-readahead-secs=3 --demuxer-max-bytes=20MiB --demuxer-max-back-bytes=10MiB --audio-device=alsa/plughw:CARD=Headphones,DEV=0 ytdl://ytsearch:'${searchquery}'`,
+    `mpv --no-video -no-osc --reset-on-next-file=all --demuxer-readahead-secs=3 --demuxer-max-bytes=20MiB --demuxer-max-back-bytes=10MiB --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket ytdl://ytsearch:'${searchquery}'`,
     {
       shell: "/bin/bash",
     }
@@ -105,6 +105,25 @@ const MPVStatus = (setInfo?: IMPVStreamInfo) => {
   return mpv_info;
 };
 
+const handleSetIndex = (index: number) => {
+  exec(
+    `echo '{ "command": ["set_property", "time-pos", ${index}] }' | socat - ~/socket`,
+    {
+      shell: "/bin/bash",
+    }
+  );
+};
+
+const handleSetPause = (pause: boolean) => {
+  exec(
+    `echo '{ "command": ["set_property", "pause", ${pause}] }' | socat - ~/socket`,
+    {
+      shell: "/bin/bash",
+    }
+  );
+  MPVStatus({ status: pause ? "paused" : "playing" });
+};
+
 const handleConnection = (connection: WebSocket.WebSocket) => {
   connectionList.push(connection);
   connection.on("close", (socket: WebSocket) => {
@@ -135,6 +154,12 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
         break;
       case "shutdown":
         exec("shutdown now");
+        break;
+      case "index":
+        handleSetIndex(parseFloat(msgContent));
+        break;
+      case "pause":
+        handleSetPause(msgContent === "true");
         break;
     }
   });

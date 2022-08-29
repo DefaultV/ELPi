@@ -79,7 +79,7 @@ input[type="submit"] {
 button:hover,
 input[type="submit"]:hover {
   cursor: pointer;
-  background: #111122;
+  background: #99112266;
   color: #fff;
 }
 
@@ -107,8 +107,13 @@ input[type="submit"]:hover {
   gap: 16px;
 }
 
-#play,
-#stop {
+#querysearch {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.ibutton {
   background: none;
   font-size: 0px;
   box-shadow: none;
@@ -119,17 +124,28 @@ input[type="submit"]:hover {
   padding: 0;
 }
 
-#play > img,
-#stop > img {
+.ibutton > img {
   width: 64px;
 }
 
-#stop {
+.ibutton {
   display: none;
 }
 
-#stop.active {
+.ibutton.active {
   display: inline-block;
+}
+
+#search {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  z-index: 1;
+}
+#search > img {
+  width: 53px;
 }
 
 .verbatim {
@@ -161,6 +177,7 @@ input[type="submit"]:hover {
   width: 100px;
   padding: 2px;
   height: 50px;
+  border-radius: 0;
 }
 
 #shutdown:hover {
@@ -219,6 +236,7 @@ input[type="submit"]:hover {
 #queryinput {
   border: none;
   font-size: 32px;
+  position: absolute;
 }
 
 .loader,
