@@ -20,8 +20,41 @@ const historyElement: HTMLDivElement = document.getElementById(
 const stopElement: HTMLButtonElement = document.getElementById(
   "stop"
 ) as HTMLButtonElement;
-document.getElementById("play")?.addEventListener("click", () => {
+const playElement: HTMLButtonElement = document.getElementById(
+  "play"
+) as HTMLButtonElement;
+const pauseElement: HTMLButtonElement = document.getElementById(
+  "pause"
+) as HTMLButtonElement;
+const scrubbarElement: HTMLButtonElement = document.getElementById(
+  "scrubbar"
+) as HTMLButtonElement;
+
+let scrubberDown = false;
+scrubbarElement?.addEventListener("pointerdown", (ev) => {
+  scrubberDown = true;
+  setScrubberWidth(ev.offsetX / scrubbarElement.clientWidth, true);
+});
+scrubbarElement?.addEventListener("pointermove", (ev) => {
+  if (scrubberDown) {
+    setScrubberWidth(ev.offsetX / scrubbarElement.clientWidth, true);
+  }
+});
+window.addEventListener("pointerup", (ev) => {
+  scrubberDown = false;
+});
+scrubbarElement?.addEventListener("pointerout", (ev) => {
+  scrubberDown = false;
+});
+
+document.getElementById("search")?.addEventListener("click", () => {
   sendWSQuery(inputField.value);
+});
+playElement?.addEventListener("click", () => {
+  sendWSPause(false);
+});
+pauseElement?.addEventListener("click", () => {
+  sendWSPause(true);
 });
 stopElement?.addEventListener("click", () => {
   SendWSKill();
@@ -45,6 +78,40 @@ const sendWSStatus = () => {
 const sendWSHistory = () => {
   socket.send("history:all");
 };
+const sendWSPause = (pause: boolean) => {
+  socket.send(`pause:${pause}`);
+};
+const sendWSIndex = (index: number) => {
+  socket.send(`index:${index}`);
+};
+
+const setScrubberWidth = (percentWidth: number, update?: boolean) => {
+  (scrubbarElement.firstElementChild! as HTMLDivElement).style.width = `${
+    percentWidth * 100
+  }%`;
+
+  update && percentIndexToRealIndex(percentWidth);
+};
+
+const percentIndexToRealIndex = (indexPercent: number) => {
+  const totalLength = getTotalVideoLength();
+  sendWSIndex(indexPercent * totalLength);
+};
+
+const getTotalVideoLength = () => {
+  const info = MPVInfo();
+  if (info.metadata) {
+    const split = info.metadata.split("/");
+    const totalSplit = split[1].split("(")[0].split(":");
+    const total =
+      parseInt(totalSplit[0]) * 60 * 60 +
+      parseInt(totalSplit[0]) * 60 +
+      parseInt(totalSplit[0]);
+
+    return total;
+  }
+  return 0;
+};
 
 function isMPVStreamInfo(
   info: IMPVStreamInfo | string[]
@@ -63,6 +130,7 @@ const populateHistory = (items: string[]) => {
     historyItem.innerHTML = item;
     historyItem.addEventListener("click", () => {
       inputField.value = item;
+      sendWSQuery(item);
     });
 
     newItems.push(historyItem);
@@ -81,12 +149,15 @@ socket.addEventListener("message", function (event) {
 });
 
 const handleOnInfo = (info: IMPVStreamInfo) => {
+  if (info.status == "idle") setScrubberWidth(0);
   const isLoading = info.status == "buffering" || info.status == "searching";
   const searchQuery = info.searchQuery ? info.searchQuery : "";
   const videoUrl = info.videoUrl
-    ? `${info.status == "playing" ? `(${searchQuery})<br>` : ""}${
-        info.videoUrl
-      }`
+    ? `${
+        info.status == "playing" || info.status == "paused"
+          ? `(${searchQuery})<br>`
+          : ""
+      }${info.videoUrl}`
     : "";
 
   let videoIndex: string = "";
@@ -107,6 +178,32 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
 
   specifyClassList(isLoading, loadingElement, "active");
   specifyClassList(info.status != "idle", stopElement, "active");
+  specifyClassList(info.status == "paused", playElement, "active");
+  specifyClassList(info.status == "playing", pauseElement, "active");
+  specifyClassList(
+    info.status == "playing" || info.status == "paused",
+    scrubbarElement,
+    "active"
+  );
+
+  MPVInfo(info);
+  if (info.metadata) {
+    const indexSplit = info.metadata?.split("/")[0].split(":");
+    indexSplit.shift();
+    const index =
+      parseInt(indexSplit[0]) * 60 * 60 +
+      parseInt(indexSplit[0]) * 60 +
+      parseInt(indexSplit[0]);
+    setScrubberWidth(index / getTotalVideoLength());
+  }
+};
+
+const mpv_info: IMPVStreamInfo = { status: "idle" };
+const MPVInfo = (info?: IMPVStreamInfo) => {
+  if (info) {
+    Object.assign(mpv_info, info);
+  }
+  return mpv_info;
 };
 
 const specifyClassList = (
