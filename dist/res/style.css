@@ -136,6 +136,34 @@ input[type="submit"]:hover {
   display: inline-block;
 }
 
+#scrubbar.active {
+  visibility: visible;
+}
+#scrubbar {
+  visibility: hidden;
+  height: 8px;
+  width: 100%;
+  background: black;
+  outline: 1px solid black;
+}
+#scrubbar > div {
+  height: 100%;
+  width: 0%;
+  background: #88221d;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  pointer-events: none;
+}
+
+#scrubber {
+  width: 12px;
+  height: 12px;
+  background: #88221d;
+  outline: 1px solid white;
+  z-index: 1;
+}
+
 #search {
   margin: 0;
   padding: 0;
