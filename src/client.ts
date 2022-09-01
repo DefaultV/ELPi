@@ -63,8 +63,10 @@ document.getElementById("shutdown")?.addEventListener("click", () => {
   sendWSShutdown();
 });
 
+let lastQuery = "";
 const sendWSQuery = (query: string) => {
   socket.send(`play:${query}`);
+  lastQuery = query;
 };
 const SendWSKill = () => {
   socket.send("kill:all");
@@ -141,6 +143,16 @@ const populateHistory = (items: string[]) => {
 
 // Listen for messages
 socket.addEventListener("message", function (event) {
+  if (event.data == "error") {
+    if (
+      confirm(
+        "There was an error preparing the audio stream, do you want to try again?"
+      )
+    ) {
+      sendWSQuery(lastQuery);
+    }
+    return;
+  }
   const info: IMPVStreamInfo | string[] = JSON.parse(event.data);
   const isMPVInfo = isMPVStreamInfo(info);
 
