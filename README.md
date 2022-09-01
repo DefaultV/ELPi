@@ -26,7 +26,7 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 ```
 sudo apt install mpv python3-pip nodejs socat
 sudo pip3 install youtube-dl
-wget https://github.com/DefaultV/ELPi/releases/download/v1.1/elpi_1.1.zip; unzip elpi_1.1.zip
+wget https://github.com/DefaultV/ELPi/releases/download/v1.3/elpi_1.3.zip; unzip elpi_1.3.zip
 sudo node dist/server.min.js
 ```
 
