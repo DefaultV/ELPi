@@ -56,13 +56,15 @@ const startMPVStream = (searchquery: string) => {
     }
   });
 
-  mpv_process.on("exit", () => {
-    MPVStatus({
-      status: "idle",
-      searchQuery: undefined,
-      videoUrl: undefined,
-      metadata: undefined,
-    });
+  mpv_process.on("exit", (code) => {
+    if (code == 0) {
+      MPVStatus({
+        status: "idle",
+        searchQuery: undefined,
+        videoUrl: undefined,
+        metadata: undefined,
+      });
+    }
   });
 };
 
