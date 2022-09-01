@@ -105,8 +105,8 @@ const getTotalVideoLength = () => {
     const totalSplit = split[1].split("(")[0].split(":");
     const total =
       parseInt(totalSplit[0]) * 60 * 60 +
-      parseInt(totalSplit[0]) * 60 +
-      parseInt(totalSplit[0]);
+      parseInt(totalSplit[1]) * 60 +
+      parseInt(totalSplit[2]);
 
     return total;
   }
@@ -192,8 +192,8 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
     indexSplit.shift();
     const index =
       parseInt(indexSplit[0]) * 60 * 60 +
-      parseInt(indexSplit[0]) * 60 +
-      parseInt(indexSplit[0]);
+      parseInt(indexSplit[1]) * 60 +
+      parseInt(indexSplit[2]);
     setScrubberWidth(index / getTotalVideoLength());
   }
 };
