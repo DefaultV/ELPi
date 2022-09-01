@@ -24,10 +24,10 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 
 ### TL;DR
 ```
-sudo apt install mpv python3-pip nodejs socat
-sudo pip3 install youtube-dl
-wget https://github.com/DefaultV/ELPi/releases/download/v1.3/elpi_1.3.zip; unzip elpi_1.3.zip
-sudo node dist/server.min.js
+sudo apt install mpv python3-pip nodejs socat;
+sudo pip3 install youtube-dl;
+wget https://github.com/DefaultV/ELPi/releases/download/v1.4/elpi_1.4.zip; unzip elpi_1.4.zip; rm elpi_1.4.zip;
+sudo node dist/server.min.js;
 ```
 
 ##### Disclaimer :triangular_flag_on_post:
