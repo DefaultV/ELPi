@@ -29,6 +29,9 @@ const pauseElement: HTMLButtonElement = document.getElementById(
 const scrubbarElement: HTMLButtonElement = document.getElementById(
   "scrubbar"
 ) as HTMLButtonElement;
+const randomElement: HTMLButtonElement = document.getElementById(
+  "random"
+) as HTMLButtonElement;
 
 let scrubberDown = false;
 scrubbarElement?.addEventListener("pointerdown", (ev) => {
@@ -123,7 +126,7 @@ function isMPVStreamInfo(
 
 const populateHistory = (items: string[]) => {
   const newItems: HTMLDivElement[] = [];
-  const uniqueHistory = new Set(items);
+  const uniqueHistory = new Set(items.filter((index) => index));
 
   uniqueHistory.forEach((item) => {
     if (item.length <= 0) return;
@@ -135,6 +138,16 @@ const populateHistory = (items: string[]) => {
       sendWSQuery(item);
     });
 
+    specifyClassList(uniqueHistory.size > 0, randomElement, "active");
+    if (uniqueHistory.size > 0) {
+      randomElement.onclick = () => {
+        sendWSQuery(
+          Array.from(uniqueHistory)[
+            Math.floor(Math.random() * uniqueHistory.size)
+          ]
+        );
+      };
+    }
     newItems.push(historyItem);
   });
 
