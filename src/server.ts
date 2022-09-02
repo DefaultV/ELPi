@@ -23,21 +23,6 @@ let mpv_info: IMPVStreamInfo = {
 const connectionList: WebSocket[] = [];
 const history: string[] = [];
 
-enum ELPiFeedback {
-  needle = 1,
-  dust,
-  click,
-}
-
-const notifyWithSound = (index: ELPiFeedback) => {
-  exec(
-    `mpv --audio-device=alsa/plughw:CARD=Headphones,DEV=0 dist/res/elpi_vinyl${index}.mp3`,
-    {
-      shell: "/bin/bash",
-    }
-  );
-};
-
 const startMPVStream = (searchquery: string) => {
   killMPVStream();
 
@@ -79,7 +64,6 @@ const startMPVStream = (searchquery: string) => {
         videoUrl: undefined,
         metadata: undefined,
       });
-      notifyWithSound(ELPiFeedback.needle);
     }
   });
 };
@@ -103,7 +87,6 @@ const handleStreamOut = (data: string) => {
     return;
   }
   if (data.includes("https://")) {
-    notifyWithSound(ELPiFeedback.dust);
     MPVStatus({
       status: "buffering",
       videoUrl: `https${data.split("https")[1].trim()}`,
@@ -159,7 +142,6 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
 
     switch (msgType) {
       case "play":
-        notifyWithSound(ELPiFeedback.click);
         if (msgContent && msgContent?.length > 1) startMPVStream(msgContent);
         sendHistoryToSocket(connection);
         break;
@@ -210,5 +192,4 @@ app.all("/", function (request, response) {
 });
 app.listen(port, () => {
   console.log(`Listening on ${port} 🚀`);
-  notifyWithSound(ELPiFeedback.needle);
 });
