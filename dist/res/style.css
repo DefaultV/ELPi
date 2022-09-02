@@ -176,6 +176,23 @@ input[type="submit"]:hover {
   width: 53px;
 }
 
+#randomizer {
+  position: absolute;
+  padding: 12px;
+  box-sizing: border-box;
+  width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.66);
+}
+#random {
+  width: 32px;
+}
+#random > img {
+  width: 32px;
+  height: 32px;
+}
 .verbatim {
   text-align: center;
   color: white;
@@ -233,6 +250,7 @@ input[type="submit"]:hover {
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(2px);
   overflow-x: hidden;
+  padding-top: 64px;
 }
 
 .history-item {
