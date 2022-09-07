@@ -14,11 +14,13 @@ interface IMPVStreamInfo {
   metadata?: string;
   videoUrl?: string;
   searchQuery?: string;
+  queue?: string[];
 }
 
 let mpv_process: ChildProcess;
 let mpv_info: IMPVStreamInfo = {
   status: "idle",
+  queue: [],
 };
 const connectionList: WebSocket[] = [];
 const history: string[] = [];
@@ -58,12 +60,7 @@ const startMPVStream = (searchquery: string) => {
 
   mpv_process.on("exit", (code) => {
     if (code == 0) {
-      MPVStatus({
-        status: "idle",
-        searchQuery: undefined,
-        videoUrl: undefined,
-        metadata: undefined,
-      });
+      playNextInQueue();
     }
   });
 };
@@ -77,6 +74,32 @@ const killMPVStream = () => {
   });
   if (!mpv_process) return;
   mpv_process.kill();
+};
+
+const handleAddQueryToQueue = (query: string) => {
+  const MPVInfo = MPVStatus();
+  if (MPVInfo.queue?.length == 0 && MPVInfo.status == "idle") {
+    startMPVStream(query);
+  } else {
+    MPVStatus();
+    MPVInfo.queue?.push(query);
+  }
+};
+const clearQueue = () => {
+  MPVStatus().queue!.length = 0;
+};
+
+const playNextInQueue = () => {
+  const MPVInfo = MPVStatus();
+  MPVStatus({
+    status: "idle",
+    searchQuery: undefined,
+    videoUrl: undefined,
+    metadata: undefined,
+  });
+  if (MPVInfo.queue?.length == 0) return;
+  startMPVStream(MPVInfo.queue![0]);
+  MPVInfo.queue?.shift();
 };
 
 const handleStreamOut = (data: string) => {
@@ -105,6 +128,12 @@ const MPVStatus = (setInfo?: IMPVStreamInfo) => {
     );
   }
   return mpv_info;
+};
+
+const forceBroadcastMPVStatus = () => {
+  connectionList.forEach((connection) =>
+    connection.send(JSON.stringify(mpv_info))
+  );
 };
 
 const handleSetIndex = (index: number) => {
@@ -144,12 +173,15 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
       case "play":
         if (msgContent && msgContent?.length > 1) startMPVStream(msgContent);
         sendHistoryToSocket(connection);
+        clearQueue();
         break;
       case "status":
         connection.send(JSON.stringify(MPVStatus()));
         break;
       case "kill":
         killMPVStream();
+        playNextInQueue();
+        forceBroadcastMPVStatus();
         break;
       case "history":
         sendHistoryToSocket(connection);
@@ -162,6 +194,11 @@ const handleConnection = (connection: WebSocket.WebSocket) => {
         break;
       case "pause":
         handleSetPause(msgContent === "true");
+        break;
+      case "queue":
+        if (msgContent && msgContent?.length > 1)
+          handleAddQueryToQueue(msgContent);
+        forceBroadcastMPVStatus();
         break;
     }
   });

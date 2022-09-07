@@ -3,6 +3,7 @@ interface IMPVStreamInfo {
   metadata?: string;
   videoUrl?: string;
   searchQuery?: string;
+  queue?: string[];
 }
 const socket = new WebSocket(`ws://${location.host}:8080`);
 const inputField: HTMLInputElement = document.getElementById(
@@ -32,6 +33,9 @@ const scrubbarElement: HTMLButtonElement = document.getElementById(
 const randomElement: HTMLButtonElement = document.getElementById(
   "random"
 ) as HTMLButtonElement;
+const inputQueueElement: HTMLButtonElement = document.getElementById(
+  "inputqueue"
+) as HTMLButtonElement;
 
 let scrubberDown = false;
 scrubbarElement?.addEventListener("pointerdown", (ev) => {
@@ -52,6 +56,7 @@ scrubbarElement?.addEventListener("pointerout", (ev) => {
 
 document.getElementById("search")?.addEventListener("click", () => {
   sendWSQuery(inputField.value);
+  inputField.value = "";
 });
 playElement?.addEventListener("click", () => {
   sendWSPause(false);
@@ -64,6 +69,10 @@ stopElement?.addEventListener("click", () => {
 });
 document.getElementById("shutdown")?.addEventListener("click", () => {
   sendWSShutdown();
+});
+document.getElementById("queue")?.addEventListener("click", () => {
+  sendWSQueue(inputField.value);
+  inputField.value = "";
 });
 
 let lastQuery = "";
@@ -88,6 +97,9 @@ const sendWSPause = (pause: boolean) => {
 };
 const sendWSIndex = (index: number) => {
   socket.send(`index:${index}`);
+};
+const sendWSQueue = (query: string) => {
+  socket.send(`queue:${query}`);
 };
 
 const setScrubberWidth = (percentWidth: number, update?: boolean) => {
@@ -134,7 +146,6 @@ const populateHistory = (items: string[]) => {
     historyItem.classList.add("history-item");
     historyItem.innerHTML = item;
     historyItem.addEventListener("click", () => {
-      inputField.value = item;
       sendWSQuery(item);
     });
 
@@ -152,6 +163,23 @@ const populateHistory = (items: string[]) => {
   });
 
   historyElement.replaceChildren(...newItems);
+};
+
+const populateQueue = (items: string[]) => {
+  if (items.length == 0) {
+    inputQueueElement.innerHTML = "";
+  }
+  const newItems: HTMLDivElement[] = [];
+
+  items.forEach((item, i) => {
+    const queueItem = document.createElement("div");
+    queueItem.classList.add("queue-item");
+    queueItem.innerHTML = i == 0 ? `- ${item} -` : item;
+
+    newItems.push(queueItem);
+  });
+
+  inputQueueElement.replaceChildren(...newItems);
 };
 
 // Listen for messages
@@ -173,6 +201,7 @@ socket.addEventListener("message", function (event) {
   else populateHistory(info);
 });
 
+let lastQueueLength = 0;
 const handleOnInfo = (info: IMPVStreamInfo) => {
   if (info.status == "idle") setScrubberWidth(0);
   const isLoading = info.status == "buffering" || info.status == "searching";
@@ -191,6 +220,11 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
     const split = info.metadata.split("/");
     videoIndex = split[0].split("A:")[1];
     videoLength = split[1].split("(")[0];
+  }
+
+  if (lastQueueLength != info.queue!.length) {
+    lastQueueLength = info.queue!.length;
+    populateQueue(info.queue!);
   }
 
   const videoData =
