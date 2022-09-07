@@ -22,6 +22,17 @@ If you want a free, easy to use audio streaming service (and without ads!), seek
 
 A good DIY project to tinker with, and even better, you can host this alongside all the different things you otherwise use the Pi for, e.g. retropie, without needing to mess with configs or flashing.
 
+### Features
+:tada: Song queue
+
+:tada: Playback controls (scrubbing + more)
+
+:tada: History (quick play + randomize)
+
+:tada: Realtime playback information for any device
+
+:magic_wand: Sleek AI generated visuals
+
 ### TL;DR
 ```
 sudo apt install mpv python3-pip nodejs socat;
