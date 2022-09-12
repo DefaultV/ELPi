@@ -47,8 +47,8 @@ At the current state, this project:
 
 Some values or arguments might differ from Pi to Pi, like the jack audio card in the MPV command arguments. Find out what your audio jack is through alsa `aplay -L` and replace the argument `--audio-device=alsa/plughw:CARD=Headphones,DEV=0`. This project has only been tested on a Raspberry Pi A+
 
-##### Current Issues
-Check out the [Issues](https://github.com/DefaultV/mpvberrypi/issues)
+### Feedback
+Please post features in the [Issues](https://github.com/DefaultV/mpvberrypi/issues) tab, prefix issue with `Feature Suggestion:` and label it `feature`
 
 ## Instructions
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
