@@ -16,9 +16,6 @@ If you want a free, easy to use audio streaming service (and without ads!), seek
 - Doesn't require linking separate services
 - Doesn't require any accounts (or paid accounts)
 ```
-```
-- Requires a local network, a Raspberry Pi and some speakers
-```
 
 A good DIY project to tinker with, and even better, you can host this alongside all the different things you otherwise use the Pi for, e.g. retropie, without needing to mess with configs or flashing.
 
