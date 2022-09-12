@@ -32,11 +32,12 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 
 ### TL;DR
 ```
-sudo apt install mpv python3-pip nodejs socat;
-sudo pip3 install youtube-dl;
-mkdir ELPi; cd ELPi;
-wget https://github.com/DefaultV/ELPi/releases/download/v1.6/elpi_1.6.zip; unzip elpi_1.6.zip; rm elpi_1.6.zip;
-sudo node dist/server.min.js;
+sudo apt install mpv python3-pip nodejs socat
+sudo pip3 install youtube-dl
+mkdir ELPi; cd ELPi
+wget https://github.com/DefaultV/ELPi/releases/download/v1.6/elpi_1.6.zip
+unzip elpi_1.6.zip; rm elpi_1.6.zip
+sudo node dist/server.min.js
 ```
 
 ##### Disclaimer :triangular_flag_on_post:
