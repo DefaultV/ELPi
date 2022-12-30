@@ -10,7 +10,7 @@ interface IAPIResponse {
   items: { id: { videoId: string }; snippet: { title: string } }[];
 }
 
-const socket = new WebSocket(`ws://${location.host.split(":")[0]}`);
+const socket = new WebSocket(`ws://${location.host.split(":")[0]}:8080`);
 const MAX_STRING_LENGTH = 60;
 
 const inputField: HTMLInputElement = document.getElementById(
