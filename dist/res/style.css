@@ -186,9 +186,11 @@ input[type="submit"]:hover {
   justify-content: space-between;
   align-items: center;
   color: rgba(255, 255, 255, 0.66);
+  pointer-events: none;
 }
 #random {
   width: 32px;
+  pointer-events: auto;
 }
 #random > img {
   width: 32px;
@@ -385,4 +387,39 @@ input[type="submit"]:hover {
   40% {
     box-shadow: 0 2.5em 0 0;
   }
+}
+
+.searchhelper-item {
+  background: #eee;
+  color: black;
+  border-radius: 6px;
+  padding: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+}
+
+.searchhelper-item:hover {
+  background: #88221d;
+  color: #eee;
+  cursor: pointer;
+}
+
+.search-helper {
+  margin-top: 214px;
+  margin-bottom: 24px;
+  width: 250px;
+  min-width: 0;
+  background: #88221d99;
+  padding: 9px;
+  border-radius: 6px;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+  display: none;
+  height: 388px;
+  overflow: auto;
+}
+
+#searchhelper-responses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
