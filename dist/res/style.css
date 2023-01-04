@@ -38,7 +38,7 @@ input[type="text"]:focus {
 }
 
 input[type="text"] {
-  width: 400px;
+  width: 300px;
   padding: 8px;
   color: #fff;
   padding-left: 16px;
@@ -215,7 +215,7 @@ input[type="submit"]:hover {
   max-height: 128px;
   overflow: auto;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  width: 400px;
+  width: 300px;
   box-sizing: border-box;
 }
 
@@ -279,14 +279,13 @@ input[type="submit"]:hover {
   position: absolute;
   padding: 12px;
   box-sizing: border-box;
-  /* width: 400px; */
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: rgba(255, 255, 255, 0.66);
   pointer-events: none;
   right: 0;
-  bottom: 0;
+  bottom: 18px;
   z-index: 2;
 }
 
@@ -295,7 +294,7 @@ input[type="submit"]:hover {
   background: #000000bb;
   padding: 8px;
   width: 100%;
-  max-width: 400px;
+  max-width: 300px;
   border-radius: 6px;
   overflow-wrap: break-word;
   cursor: pointer;
@@ -326,7 +325,7 @@ input[type="submit"]:hover {
 
 .search-response {
   display: flex;
-  max-width: 400px;
+  max-width: 300px;
   font-size: 18px;
   gap: 12px;
   flex-direction: column;
