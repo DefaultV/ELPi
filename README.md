@@ -31,6 +31,8 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 
 :tada: Realtime playback information for any device
 
+:tada: Synchronized playback information across all connected devices
+
 :tada: Optionally get search results via API
 
 :magic_wand: Sleek AI generated visuals
