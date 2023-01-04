@@ -1,6 +1,6 @@
 # ELPi :notes:
 
-Using youtube-dl and MPV, host your own free audio streaming service locally on the Raspberry Pi.
+Using youtube-dl/yt-dlp and MPV, host your own free audio streaming service locally on the Raspberry Pi.
 
 <p align="center">
   <img width="128" src="https://user-images.githubusercontent.com/14123880/184543425-90f57adf-c123-4138-aec1-b6c349e30eeb.png">
@@ -39,12 +39,19 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 
 ```
 sudo apt install mpv python3-pip nodejs socat
-sudo pip3 install youtube-dl
+sudo pip3 install yt-dlp
 mkdir ELPi; cd ELPi
 wget https://github.com/DefaultV/ELPi/releases/download/v1.6/elpi_1.6.zip
 unzip elpi_1.6.zip; rm elpi_1.6.zip
 
 sudo node dist/server.min.js
+```
+
+Optionally (For API query results)
+
+```
+cd dist; ./settoken.sh
+Enter your API token
 ```
 
 ##### Disclaimer :triangular_flag_on_post:
@@ -76,7 +83,7 @@ The following packages are required for the system to work
 `mpv`
 `socat`
 `python3-pip`
-`youtube-dl (Through pip3, apt is outdated)`
+`yt-dlp (Through pip3, apt is outdated)`
 
 This can be done with:
 
@@ -87,7 +94,7 @@ sudo apt install mpv python3-pip nodejs socat
 Then, using pip:
 
 ```
-(sudo) pip3 install youtube-dl
+(sudo) pip3 install yt-dlp
 ```
 
 For better performance, make sure `nodejs` is somewhat the latest version, the apt version is 10.x
@@ -102,6 +109,13 @@ After downloading a release, unzip and run the following command
 
 ```
 sudo node dist/server.min.js
+```
+
+Optionally (For API query results)
+
+```
+cd dist; ./settoken.sh
+Enter your API token
 ```
 
 #### Repo setup
