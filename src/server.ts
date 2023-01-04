@@ -37,7 +37,6 @@ readFile("dist/history", "utf8", (err, data) => {
     return;
   }
   if (data) {
-    console.log(JSON.parse(data));
     Object.assign(history, JSON.parse(data));
   }
 });
