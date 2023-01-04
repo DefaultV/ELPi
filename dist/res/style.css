@@ -1,5 +1,4 @@
 ::placeholder {
-  font-style: italic;
   color: #888;
   transition: color 0.2s ease;
 }
@@ -35,19 +34,19 @@ input:focus::placeholder {
 }
 
 input[type="text"]:focus {
-  padding: 18px;
+  padding: 8px;
 }
 
 input[type="text"] {
-  min-width: 600px;
+  width: 300px;
   padding: 8px;
   color: #fff;
   padding-left: 16px;
   transition: padding 0.2s ease;
   background: rgba(0, 0, 0, 0.75);
-  outline: 1px solid #fff;
+  /* outline: 5px solid #ddd; */
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 6px;
+  border-radius: 1px;
 }
 
 body {
@@ -55,13 +54,17 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) brightness(0.5);
   display: flex;
   flex-direction: column;
   width: 100%;
   align-items: center;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  margin: 0;
+  border: 0;
+  -webkit-transition: background-image 0.4s ease-in-out;
+  transition: background-image 0.4s ease-in-out;
+  height: 100%;
 }
 
 button,
@@ -87,7 +90,6 @@ input[type="submit"]:hover {
 .flex-center {
   display: flex;
   justify-content: center;
-  margin-bottom: calc(8px + 42px);
   -webkit-gap: 12px;
   gap: 12px;
 }
@@ -98,6 +100,7 @@ input[type="submit"]:hover {
   align-items: center;
   -webkit-gap: 32px;
   gap: 32px;
+  margin-bottom: 16px;
 }
 
 #inputform {
@@ -105,6 +108,7 @@ input[type="submit"]:hover {
   flex-direction: column;
   -webkit-gap: 16px;
   gap: 16px;
+  margin-bottom: 16px;
 }
 
 #querysearch {
@@ -177,18 +181,25 @@ input[type="submit"]:hover {
   width: 53px;
 }
 
+#randomizer.active {
+  display: block;
+}
+
 #randomizer {
+  display: none;
   position: absolute;
   padding: 12px;
   box-sizing: border-box;
-  width: 600px;
-  display: flex;
+  left: 0;
   justify-content: space-between;
   align-items: center;
   color: rgba(255, 255, 255, 0.66);
+  pointer-events: none;
+  z-index: 2;
 }
 #random {
   width: 32px;
+  pointer-events: auto;
 }
 #random > img {
   width: 32px;
@@ -205,7 +216,7 @@ input[type="submit"]:hover {
   max-height: 128px;
   overflow: auto;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  width: 600px;
+  width: 300px;
   box-sizing: border-box;
 }
 
@@ -232,37 +243,79 @@ input[type="submit"]:hover {
   color: black;
 }
 
+.history.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
 .history {
-  background: #88221d99;
-  border-radius: 6px;
-  left: 8px;
-  top: 8px;
-  padding: 16px;
+  pointer-events: none;
   display: flex;
+  position: absolute;
+  background: #000000ee;
+  align-items: center;
+  border-radius: 6px;
+  opacity: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  top: 0;
+  padding: 16px;
   gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  /* outline: 1px solid #fff; */
-  width: 600px;
+  flex-direction: column;
+  width: 100%;
   overflow: auto;
-  max-height: 164px;
-  margin-bottom: 24px;
+  height: 100%;
   box-sizing: border-box;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(2px);
   overflow-x: hidden;
-  padding-top: 64px;
+  z-index: 1;
+  transition: opacity 0.5s ease;
+}
+
+#historybutton {
+  pointer-events: all;
+}
+#historybutton-container {
+  position: absolute;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.66);
+  pointer-events: none;
+  right: 0;
+  bottom: 18px;
+  z-index: 2;
 }
 
 .history-item {
-  background: #eee;
+  box-sizing: border-box;
+  background: #000000bb;
   padding: 8px;
+  width: 100%;
+  max-width: 300px;
   border-radius: 6px;
   overflow-wrap: break-word;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+  outline: 1px solid #ffffff33;
+}
+
+.history-item > p {
+  text-transform: capitalize;
+  color: #fff;
+  overflow: hidden;
+  margin: 0;
+  padding-top: 8px;
+}
+
+.history-item-image {
+  height: 64px;
 }
 
 .history-item:hover {
@@ -273,7 +326,7 @@ input[type="submit"]:hover {
 
 .search-response {
   display: flex;
-  max-width: 600px;
+  max-width: 300px;
   font-size: 18px;
   gap: 12px;
   flex-direction: column;
@@ -290,7 +343,7 @@ input[type="submit"]:hover {
   display: flex;
   flex-direction: column-reverse;
   width: 100%;
-  height: 200px;
+  height: 150px;
   align-items: center;
   margin-bottom: 14px;
   gap: 4px;
@@ -385,4 +438,50 @@ input[type="submit"]:hover {
   40% {
     box-shadow: 0 2.5em 0 0;
   }
+}
+
+.searchhelper-item {
+  background: #eee;
+  color: black;
+  border-radius: 6px;
+  padding: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+}
+
+.searchhelper-item:hover {
+  background: #88221d;
+  color: #eee;
+  cursor: pointer;
+}
+
+#search-helper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #00000099;
+  z-index: 1;
+  display: none;
+}
+
+#searchhelper-container {
+  width: 250px;
+  min-width: 0;
+  background: #88221d;
+  padding: 9px;
+  border-radius: 6px;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+  height: 388px;
+  overflow: auto;
+}
+
+#searchhelper-responses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

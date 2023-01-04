@@ -1,3 +1,5 @@
 node_modules
 dist/*.js
 bun.lockb
+*.zip
+dist/server.ts

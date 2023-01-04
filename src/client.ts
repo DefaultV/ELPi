@@ -5,7 +5,19 @@ interface IMPVStreamInfo {
   searchQuery?: string;
   queue?: string[];
 }
-const socket = new WebSocket(`ws://${location.host}:8080`);
+
+interface IELPiSongInfo {
+  searchTitle: string;
+  videoId: string;
+}
+
+interface IAPIResponse {
+  items: { id: { videoId: string }; snippet: { title: string } }[];
+}
+
+const socket = new WebSocket(`ws://${location.host.split(":")[0]}:8080`);
+const MAX_STRING_LENGTH = 60;
+
 const inputField: HTMLInputElement = document.getElementById(
   "queryinput"
 ) as HTMLInputElement;
@@ -36,6 +48,18 @@ const randomElement: HTMLButtonElement = document.getElementById(
 const inputQueueElement: HTMLButtonElement = document.getElementById(
   "inputqueue"
 ) as HTMLButtonElement;
+const searchHelperResponses = document.getElementById(
+  "searchhelper-responses"
+) as HTMLDivElement;
+const searchHelpIcon = document.getElementById("searchhelp");
+const searchHelper = document.getElementById("search-helper") as HTMLDivElement;
+const historybutton = document.getElementById(
+  "historybutton"
+) as HTMLButtonElement;
+const randomizerButton = document.getElementById(
+  "randomizer"
+) as HTMLButtonElement;
+const BACKGROUND_IMAGEURL = "/res/elpi_bg.png";
 
 let scrubberDown = false;
 scrubbarElement?.addEventListener("pointerdown", (ev) => {
@@ -65,6 +89,7 @@ pauseElement?.addEventListener("click", () => {
   sendWSPause(true);
 });
 stopElement?.addEventListener("click", () => {
+  setBackgroundImage(BACKGROUND_IMAGEURL);
   SendWSKill();
 });
 document.getElementById("shutdown")?.addEventListener("click", () => {
@@ -73,6 +98,20 @@ document.getElementById("shutdown")?.addEventListener("click", () => {
 document.getElementById("queue")?.addEventListener("click", () => {
   sendWSQueue(inputField.value);
   inputField.value = "";
+});
+searchHelpIcon?.addEventListener("click", () => {
+  searchHelpIcon.style.display = "none";
+  sendAPIQueryFromString(inputField.value);
+  inputField.value = "";
+});
+historybutton.addEventListener("click", () => {
+  const state = !historyElement.classList.contains("active");
+  specifyClassList(state, historyElement, "active");
+  specifyClassList(state, randomizerButton, "active");
+});
+randomizerButton.addEventListener("click", () => {
+  specifyClassList(false, randomizerButton, "active");
+  specifyClassList(false, historyElement, "active");
 });
 
 let lastQuery = "";
@@ -131,30 +170,37 @@ const getTotalVideoLength = () => {
 };
 
 function isMPVStreamInfo(
-  info: IMPVStreamInfo | string[]
+  info: IMPVStreamInfo | IELPiSongInfo[]
 ): info is IMPVStreamInfo {
   return (info as IMPVStreamInfo).status !== undefined;
 }
 
-const populateHistory = (items: string[]) => {
+const populateHistory = (items: IELPiSongInfo[]) => {
   const newItems: HTMLDivElement[] = [];
-  const uniqueHistory = new Set(items.filter((index) => index));
 
-  uniqueHistory.forEach((item) => {
-    if (item.length <= 0) return;
+  items.forEach((item) => {
     const historyItem = document.createElement("div");
-    historyItem.classList.add("history-item");
-    historyItem.innerHTML = item;
-    historyItem.addEventListener("click", () => {
-      sendWSQuery(item);
-    });
+    const historyImage = document.createElement("img");
+    const text = document.createElement("p");
 
-    specifyClassList(uniqueHistory.size > 0, randomElement, "active");
-    if (uniqueHistory.size > 0) {
+    text.innerHTML = item.searchTitle.substring(0, MAX_STRING_LENGTH);
+    historyItem.classList.add("history-item");
+    historyImage.classList.add("history-item-image");
+    historyItem.addEventListener("click", () => {
+      sendWSQuery(item.searchTitle);
+      specifyClassList(false, historyElement, "active");
+      specifyClassList(false, randomizerButton, "active");
+    });
+    historyImage.src = videoIdToImageUrl(item.videoId);
+    historyItem.appendChild(historyImage);
+    historyItem.appendChild(text);
+
+    specifyClassList(items.length > 0, randomElement, "active");
+    if (items.length > 0) {
       randomElement.onclick = () => {
         sendWSQuery(
-          Array.from(uniqueHistory)[
-            Math.floor(Math.random() * uniqueHistory.size)
+          Array.from(items.map((filter) => filter.searchTitle))[
+            Math.floor(Math.random() * items.length)
           ]
         );
       };
@@ -194,12 +240,23 @@ socket.addEventListener("message", function (event) {
     }
     return;
   }
-  const info: IMPVStreamInfo | string[] = JSON.parse(event.data);
+  const info: IMPVStreamInfo | IELPiSongInfo[] = JSON.parse(event.data);
   const isMPVInfo = isMPVStreamInfo(info);
 
-  if (isMPVInfo) handleOnInfo(info);
-  else populateHistory(info);
+  if (isMPVInfo) {
+    handleOnInfo(info);
+  } else {
+    populateHistory(info);
+  }
 });
+
+const setBackgroundImage = (url: string) => {
+  document.body.style.backgroundImage = `url(${url})`;
+};
+
+const videoIdToImageUrl = (videoId: string): string => {
+  return `https://img.youtube.com/vi/${videoId}/0.jpg`;
+};
 
 let lastQueueLength = 0;
 const handleOnInfo = (info: IMPVStreamInfo) => {
@@ -209,11 +266,14 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
   const videoUrl = info.videoUrl
     ? `${
         info.status == "playing" || info.status == "paused"
-          ? `(${searchQuery})<br>`
+          ? `${searchQuery}<br>`
           : ""
-      }${info.videoUrl}`
+      }`
     : "";
 
+  if (info.videoUrl) {
+    setBackgroundImage(videoIdToImageUrl(info.videoUrl));
+  }
   let videoIndex: string = "";
   let videoLength: string = "";
   if (info.metadata) {
@@ -230,7 +290,14 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
   const videoData =
     videoIndex && videoLength ? `${videoIndex} / ${videoLength}` : "";
 
-  const streamInfo = `<b>${info.status}</b> ${
+  const status =
+    info.status == "searching"
+      ? "<b>Buffering</b>"
+      : info.status == "idle"
+      ? "<b>Idle</b>"
+      : "";
+
+  const streamInfo = `${status}${
     info.status == "searching" ? searchQuery : ""
   } ${videoUrl}<br>${videoData}`;
   statusField.innerHTML = streamInfo;
@@ -280,6 +347,46 @@ const specifyClassList = (
     }
   }
 };
+
+const handleResponse = (resp: IAPIResponse) => {
+  const newItems: HTMLDivElement[] = [];
+
+  resp.items.forEach((item, i) => {
+    const historyItem = document.createElement("div");
+    historyItem.classList.add("searchhelper-item");
+    historyItem.innerHTML = `${i == 0 ? "🔥" : "🔍"} - ${item.snippet.title}`;
+    historyItem.addEventListener("click", () => {
+      sendWSQuery(item.snippet.title);
+      searchHelper!.style.display = "none";
+    });
+
+    newItems.push(historyItem);
+  });
+
+  searchHelperResponses.replaceChildren(...newItems);
+  searchHelpIcon!.style.display = "block";
+  searchHelper!.style.display = "flex";
+};
+
+const KEY = "APITOKEN";
+const sendAPIQueryFromString = (query: string) => {
+  const queryParts = query.split(" ").join("+");
+  const fetchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${queryParts}&key=${KEY}`;
+
+  fetch(fetchUrl, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((response) => handleResponse(response));
+};
+
+if (KEY.length == 8) {
+  searchHelpIcon!.style.display = "none";
+}
 
 inputField.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
