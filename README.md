@@ -60,7 +60,7 @@ Enter your API token
 
 At the current state, this project:
 
-- Either take the first result of a given youtube search string or directly play a "video", given a URL
+- Either take the first result of a given youtube search string or directly play a "video", given a URL (You can however pass a token and get the first 5 results to choose from)
 - Requires manually updating youtube-dl from pip3 occasionally (Can be automated)
 
 Some values or arguments might differ from Pi to Pi, like the jack audio card in the MPV command arguments. Find out what your audio jack is through alsa `aplay -L` and replace the argument `--audio-device=alsa/plughw:CARD=Headphones,DEV=0`. This project has only been tested on a Raspberry Pi A+
