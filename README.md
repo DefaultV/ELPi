@@ -41,8 +41,8 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 sudo apt install mpv python3-pip nodejs socat
 sudo pip3 install yt-dlp
 mkdir ELPi; cd ELPi
-wget https://github.com/DefaultV/ELPi/releases/download/v1.6/elpi_1.6.zip
-unzip elpi_1.6.zip; rm elpi_1.6.zip
+wget https://github.com/DefaultV/ELPi/releases/download/v1.8/elpi_1.8.zip
+unzip elpi_1.8.zip; rm elpi_1.8.zip
 
 sudo node dist/server.min.js
 ```
