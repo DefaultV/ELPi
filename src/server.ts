@@ -3,18 +3,24 @@ import { ChildProcess, exec, spawn } from "child_process";
 import WebSocket, { WebSocketServer } from "ws";
 import express from "express";
 import * as path from "path";
+import { writeFile } from "fs";
 
 const wssPort = 8080;
 const wss = new WebSocketServer({ port: wssPort });
-const port = 80;
+const port = 3000;
 const app = express();
 
 interface IMPVStreamInfo {
-  status: "idle" | "searching" | "playing" | "buffering" | "paused";
+  status?: "idle" | "searching" | "playing" | "buffering" | "paused";
   metadata?: string;
   videoUrl?: string;
   searchQuery?: string;
   queue?: string[];
+}
+
+interface IELPiSongInfo {
+  searchTitle: string;
+  videoId: string;
 }
 
 let mpv_process: ChildProcess;
@@ -23,14 +29,17 @@ let mpv_info: IMPVStreamInfo = {
   queue: [],
 };
 const connectionList: WebSocket[] = [];
-const history: string[] = [];
+const history: IELPiSongInfo[] = [];
 
 readFile("dist/history", "utf8", (err, data) => {
   if (err) {
     console.error(err);
     return;
   }
-  history.push(...data.split("\n"));
+  if (data) {
+    console.log(JSON.parse(data));
+    Object.assign(history, JSON.parse(data));
+  }
 });
 
 const startMPVStream = (searchquery: string) => {
@@ -39,36 +48,18 @@ const startMPVStream = (searchquery: string) => {
   MPVStatus({
     status: "searching",
     searchQuery: searchquery,
-    videoUrl: " ",
+    videoUrl: undefined,
   });
-  addQueryToHistory(searchquery);
 
   let formattedQuery = searchquery.replace(/[^\w\s]/gi, "");
   mpv_process = spawn(
-    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - 2>/dev/null | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=no --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`,
+    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=no --input-ipc-server=~/socket -`,
     { shell: "/bin/bash" }
   );
 
-  mpv_process.stdout?.on("data", (data) => {
-    handleStreamOut(data.toString());
-  });
-
-  const updateRate = 14;
-  let updateFrame = updateRate;
-  mpv_process.stderr?.on("data", (data) => {
-    const dataString: string = data.toString();
-    if (dataString.includes("A:")) {
-      if (updateFrame >= updateRate) {
-        MPVStatus({
-          status: mpv_info.status,
-          metadata: dataString,
-        });
-        updateFrame = 0;
-      }
-      updateFrame++;
-      return;
-    }
-  });
+  mpv_process.stderr.addListener("data", (data) =>
+    handleStreamOut(data.toString())
+  );
 
   mpv_process.on("exit", (code) => {
     if (code == 0) {
@@ -85,7 +76,7 @@ const killMPVStream = () => {
     metadata: undefined,
   });
   if (!mpv_process) return;
-  spawn(`killall mpv`, { shell: "/bin/bash" });
+  spawn(`killall mpv yt-dlp`, { shell: "/bin/bash" });
   mpv_process.kill();
 };
 
@@ -122,14 +113,20 @@ const handleStreamOut = (data: string) => {
     killMPVStream();
     return;
   }
-  if (data.includes("https://")) {
+  if (data.includes("A:")) {
     MPVStatus({
-      status: "buffering",
-      videoUrl: `https${data.split("https")[1].trim()}`,
+      metadata: data,
     });
   }
-  if (data.includes("(+)")) {
-    MPVStatus({ status: "playing" });
+  if (data.includes("[info]")) {
+    const videoId = data.split("[info] ")[1].split(":")[0];
+    MPVStatus({
+      status: "playing",
+      videoUrl: videoId,
+    });
+
+    addQueryToHistory(MPVStatus().searchQuery, videoId);
+    connectionList.forEach((connection) => sendHistoryToSocket(connection));
   }
 };
 
@@ -184,8 +181,9 @@ const handleConnection = (connection: WebSocket) => {
 
     switch (msgType) {
       case "play":
-        if (msgContent && msgContent?.length > 1) startMPVStream(msgContent);
-        sendHistoryToSocket(connection);
+        if (msgContent && msgContent?.length > 1) {
+          startMPVStream(msgContent);
+        }
         clearQueue();
         break;
       case "status":
@@ -221,9 +219,28 @@ const sendHistoryToSocket = (connection: WebSocket) => {
   connection.send(JSON.stringify(history));
 };
 
-const addQueryToHistory = (query: string) => {
-  appendFile("dist/history", `${query}\n`, () => null);
-  history.push(query);
+const arrayContainsObject = <T extends Record<string, unknown>>(
+  array: T[],
+  object: T
+) => {
+  return array.some((item) =>
+    Object.keys(item).every((key) => item[key] === object[key])
+  );
+};
+
+const addQueryToHistory = (query: string, videoId: string) => {
+  if (query?.length <= 0 || videoId?.length <= 0) {
+    return;
+  }
+  const newHistoryItem = { searchTitle: query, videoId: videoId };
+  if (!arrayContainsObject(history, newHistoryItem)) {
+    history.push({ searchTitle: query, videoId: videoId });
+    writeFile("dist/history", JSON.stringify(history), (err) => {
+      if (err) {
+        console.error(err);
+      }
+    });
+  }
 };
 
 wss.on("connection", handleConnection);

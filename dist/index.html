@@ -4,9 +4,11 @@
   <title>ELPi</title>
   <link rel="icon" type="image/x-icon" href="res/elpi_logo.png">
   <link rel="stylesheet" href="res/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
+  <div class="backdrop"></div>
   <div class="content-top">
     <div style="min-width: 400px; display: flex; gap: 8px">
       <div>
@@ -14,10 +16,16 @@
         </div>
         <div id="inputform">
           <div id="querysearch">
-            <input id="queryinput" type="text" name="query" placeholder="Search & Play">
+            <input id="queryinput" type="text" name="query" placeholder="Search">
             <button class="input-button" id="search"><img src="res/elpi_search.png" /></button>
             <button class="input-button" id="queue"><img src="res/elpi_queue.png" /></button>
             <button class="input-button" id="searchhelp"><img src="res/elpi_help.png" /></button>
+          </div>
+          <div id="scrubbar">
+            <div>
+              <div id="scrubber">
+              </div>
+            </div>
           </div>
           <div class="flex-center">
             <button class="ibutton" id="play"><img src="res/elpi_play.png" /></button>
@@ -29,23 +37,8 @@
         <div class="search-response">
 
           <div id="loader" class="loader"></div>
-          <div id="scrubbar">
-            <div>
-              <div id="scrubber">
-              </div>
-            </div>
-          </div>
 
           <div id="status" class="verbatim"></div>
-          <div style="display: flex; justify-content: flex-end;">
-            <div id="history" class="history"></div>
-            <div id="randomizer">
-              <div>History</div>
-              <div style="width: 32px"></div>
-              <button class="ibutton" id="random"><img src="res/elpi_random.png" /></button>
-            </div>
-          </div>
-
         </div>
       </div>
       <div id="search-helper" class="search-helper">
@@ -55,7 +48,17 @@
         </div>
       </div>
     </div>
-    <img src="res/elpi_logo.png" width="150px" />
+  </div>
+  <div id="history-outer">
+    <div id="history" class="history"></div>
+  </div>
+  <div id="randomizer">
+    <button class="ibutton" id="random"><img src="res/elpi_random.png" /></button>
+  </div>
+  <div id="historybutton-container">
+    <button class="ibutton active" id="historybutton"><img src="res/elpi_help.png" /></button>
+  </div>
+  <img src="res/elpi_logo.png" width="150px" />
 </body>
 
 <script src="client.js"></script>
