@@ -165,7 +165,8 @@ systemctl enable elpi && systemctl start elpi
 If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field.
 
 <p align="center">
-  <img width="500" src="https://user-images.githubusercontent.com/14123880/188965977-99b10c3b-d531-4dbe-a8a1-6258a2b7a6c0.png">
+  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/210864940-08ad4c91-063c-4279-aba8-67c0b1670a21.png">
+  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/210865768-a6e72785-29d4-446a-bec5-0644009409bc.png">
 </p>
 
 # IMPORTANT
