@@ -21,18 +21,12 @@ const MAX_STRING_LENGTH = 60;
 const inputField: HTMLInputElement = document.getElementById(
   "queryinput"
 ) as HTMLInputElement;
-const statusField: HTMLDivElement = document.getElementById(
-  "status"
-) as HTMLDivElement;
 const loadingElement: HTMLDivElement = document.getElementById(
   "loader"
 ) as HTMLDivElement;
 const historyElement: HTMLDivElement = document.getElementById(
   "history"
 ) as HTMLDivElement;
-const stopElement: HTMLButtonElement = document.getElementById(
-  "stop"
-) as HTMLButtonElement;
 const playElement: HTMLButtonElement = document.getElementById(
   "play"
 ) as HTMLButtonElement;
@@ -51,6 +45,17 @@ const inputQueueElement: HTMLButtonElement = document.getElementById(
 const searchHelperResponses = document.getElementById(
   "searchhelper-responses"
 ) as HTMLDivElement;
+const controlsContainer = document.getElementById(
+  "controlscontainer"
+) as HTMLDivElement;
+const timestamps = document.getElementById("timestamps") as HTMLDivElement;
+const timestampsIndex = document.getElementById(
+  "timestamp-index"
+) as HTMLDivElement;
+const timestampsLength = document.getElementById(
+  "timestamp-length"
+) as HTMLDivElement;
+const songtitle = document.getElementById("songtitle") as HTMLDivElement;
 const searchHelpIcon = document.getElementById("searchhelp");
 const searchHelper = document.getElementById("search-helper") as HTMLDivElement;
 const historybutton = document.getElementById(
@@ -88,21 +93,18 @@ playElement?.addEventListener("click", () => {
 pauseElement?.addEventListener("click", () => {
   sendWSPause(true);
 });
-stopElement?.addEventListener("click", () => {
-  setBackgroundImage(BACKGROUND_IMAGEURL);
-  SendWSKill();
-});
 document.getElementById("shutdown")?.addEventListener("click", () => {
   sendWSShutdown();
 });
 document.getElementById("queue")?.addEventListener("click", () => {
   sendWSQueue(inputField.value);
-  inputField.value = "";
+});
+document.getElementById("searchhelper-close")?.addEventListener("click", () => {
+  specifyClassList(false, searchHelper, "active");
 });
 searchHelpIcon?.addEventListener("click", () => {
   searchHelpIcon.style.display = "none";
   sendAPIQueryFromString(inputField.value);
-  inputField.value = "";
 });
 historybutton.addEventListener("click", () => {
   const state = !historyElement.classList.contains("active");
@@ -179,21 +181,15 @@ const populateHistory = (items: IELPiSongInfo[]) => {
   const newItems: HTMLDivElement[] = [];
 
   items.forEach((item) => {
-    const historyItem = document.createElement("div");
-    const historyImage = document.createElement("img");
-    const text = document.createElement("p");
-
-    text.innerHTML = item.searchTitle.substring(0, MAX_STRING_LENGTH);
-    historyItem.classList.add("history-item");
-    historyImage.classList.add("history-item-image");
-    historyItem.addEventListener("click", () => {
-      sendWSQuery(item.searchTitle);
-      specifyClassList(false, historyElement, "active");
-      specifyClassList(false, randomizerButton, "active");
-    });
-    historyImage.src = videoIdToImageUrl(item.videoId);
-    historyItem.appendChild(historyImage);
-    historyItem.appendChild(text);
+    const historyItem = createSongContainer(
+      item.searchTitle,
+      item.videoId,
+      () => {
+        sendWSQuery(item.searchTitle);
+        specifyClassList(false, historyElement, "active");
+        specifyClassList(false, randomizerButton, "active");
+      }
+    );
 
     specifyClassList(items.length > 0, randomElement, "active");
     if (items.length > 0) {
@@ -209,6 +205,26 @@ const populateHistory = (items: IELPiSongInfo[]) => {
   });
 
   historyElement.replaceChildren(...newItems);
+};
+
+const createSongContainer = (
+  title: string,
+  videoId: string,
+  onContainerClick?: () => void
+): HTMLDivElement => {
+  const songContainer = document.createElement("div");
+  const songImage = document.createElement("img");
+  const songText = document.createElement("p");
+
+  songText.innerHTML = title.substring(0, MAX_STRING_LENGTH);
+  songContainer.classList.add("history-item");
+  songImage.classList.add("history-item-image");
+  songContainer.addEventListener("click", onContainerClick);
+  songImage.src = videoIdToImageUrl(videoId);
+  songContainer.appendChild(songImage);
+  songContainer.appendChild(songText);
+
+  return songContainer;
 };
 
 const populateQueue = (items: string[]) => {
@@ -259,19 +275,14 @@ const videoIdToImageUrl = (videoId: string): string => {
 };
 
 let lastQueueLength = 0;
+let previousInfoStatus = "idle";
 const handleOnInfo = (info: IMPVStreamInfo) => {
   if (info.status == "idle") setScrubberWidth(0);
   const isLoading = info.status == "buffering" || info.status == "searching";
-  const searchQuery = info.searchQuery ? info.searchQuery : "";
-  const videoUrl = info.videoUrl
-    ? `${
-        info.status == "playing" || info.status == "paused"
-          ? `${searchQuery}<br>`
-          : ""
-      }`
-    : "";
+  const changedState = previousInfoStatus != info.status;
+  previousInfoStatus = info.status;
 
-  if (info.videoUrl) {
+  if (info.videoUrl && changedState) {
     setBackgroundImage(videoIdToImageUrl(info.videoUrl));
   }
   let videoIndex: string = "";
@@ -287,30 +298,29 @@ const handleOnInfo = (info: IMPVStreamInfo) => {
     populateQueue(info.queue!);
   }
 
-  const videoData =
-    videoIndex && videoLength ? `${videoIndex} / ${videoLength}` : "";
+  if (changedState) {
+    const hasSong = info.status == "playing" || info.status == "paused";
+    specifyClassList(hasSong, songtitle, "active");
+    specifyClassList(hasSong, timestamps, "active");
+    specifyClassList(hasSong, controlsContainer, "active");
+    songtitle.innerHTML = info.searchQuery;
 
-  const status =
-    info.status == "searching"
-      ? "<b>Buffering</b>"
-      : info.status == "idle"
-      ? "<b>Idle</b>"
-      : "";
+    specifyClassList(isLoading, loadingElement, "active");
+    specifyClassList(info.status == "paused", playElement, "active");
+    specifyClassList(info.status == "playing", pauseElement, "active");
+    specifyClassList(
+      info.status == "playing" || info.status == "paused",
+      scrubbarElement,
+      "active"
+    );
 
-  const streamInfo = `${status}${
-    info.status == "searching" ? searchQuery : ""
-  } ${videoUrl}<br>${videoData}`;
-  statusField.innerHTML = streamInfo;
+    if (info.status == "idle" || info.status == "searching") {
+      setBackgroundImage(BACKGROUND_IMAGEURL);
+    }
+  }
 
-  specifyClassList(isLoading, loadingElement, "active");
-  specifyClassList(info.status != "idle", stopElement, "active");
-  specifyClassList(info.status == "paused", playElement, "active");
-  specifyClassList(info.status == "playing", pauseElement, "active");
-  specifyClassList(
-    info.status == "playing" || info.status == "paused",
-    scrubbarElement,
-    "active"
-  );
+  timestampsIndex.innerHTML = formatTime(videoIndex);
+  timestampsLength.innerHTML = formatTime(videoLength);
 
   MPVInfo(info);
   if (info.metadata) {
@@ -332,6 +342,14 @@ const MPVInfo = (info?: IMPVStreamInfo) => {
   return mpv_info;
 };
 
+const formatTime = (time: string) => {
+  const formattedTime = time.split(":");
+  if (time.length >= 3 && parseInt(formattedTime[0]) == 0) {
+    return `${formattedTime[1]}:${formattedTime[2]}`;
+  }
+  return time;
+};
+
 const specifyClassList = (
   add: boolean,
   element: HTMLElement,
@@ -350,22 +368,23 @@ const specifyClassList = (
 
 const handleResponse = (resp: IAPIResponse) => {
   const newItems: HTMLDivElement[] = [];
+  specifyClassList(true, searchHelper, "active");
 
-  resp.items.forEach((item, i) => {
-    const historyItem = document.createElement("div");
-    historyItem.classList.add("searchhelper-item");
-    historyItem.innerHTML = `${i == 0 ? "🔥" : "🔍"} - ${item.snippet.title}`;
-    historyItem.addEventListener("click", () => {
-      sendWSQuery(item.snippet.title);
-      searchHelper!.style.display = "none";
-    });
+  resp.items.forEach((item) => {
+    const songItem = createSongContainer(
+      item.snippet.title,
+      item.id.videoId,
+      () => {
+        sendWSQuery(item.snippet.title);
+        specifyClassList(false, searchHelper, "active");
+      }
+    );
 
-    newItems.push(historyItem);
+    newItems.push(songItem);
   });
 
   searchHelperResponses.replaceChildren(...newItems);
   searchHelpIcon!.style.display = "block";
-  searchHelper!.style.display = "flex";
 };
 
 const KEY = "APITOKEN";

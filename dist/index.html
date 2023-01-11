@@ -10,7 +10,7 @@
 <body>
   <div class="backdrop"></div>
   <div class="content-top">
-    <div style="min-width: 300px; display: flex; gap: 8px">
+    <div style="width: 300px; display: flex; gap: 8px">
       <div>
         <div id="inputqueue">
         </div>
@@ -21,30 +21,36 @@
             <button class="input-button" id="queue"><img src="res/elpi_queue.png" /></button>
             <button class="input-button" id="searchhelp"><img src="res/elpi_help.png" /></button>
           </div>
+          <div id="songtitle">
+          </div>
           <div id="scrubbar">
             <div>
               <div id="scrubber">
               </div>
             </div>
           </div>
-          <div class="flex-center">
-            <button class="ibutton" id="play"><img src="res/elpi_play.png" /></button>
-            <button class="ibutton" id="pause"><img src="res/elpi_pause.png" /></button>
-            <button class="ibutton" id="stop"><img src="res/elpi_stop.png" /></button>
-            <button id="shutdown">Power off</button>
+          <div id="timestamps">
+            <div id="timestamp-index"></div>
+            <div id="timestamp-length"></div>
           </div>
         </div>
+        <div class="flex-center" id="controlscontainer">
+          <button class="ibutton" id="play"><img src="res/elpi_play.png" /></button>
+          <button class="ibutton" id="pause"><img src="res/elpi_pause.png" /></button>
+        </div>
         <div class="search-response">
-
           <div id="loader" class="loader"></div>
-
-          <div id="status" class="verbatim"></div>
         </div>
       </div>
+      <button id="shutdown"><img src="res/elpi_off.png" /></button>
       <div id="search-helper" class="search-helper">
         <div id="searchhelper-container">
           <div id="searchhelper-responses">
+            <div class="history-item searchhelper-item">hello</div>
           </div>
+          <button class="ibutton active" id="searchhelper-close">
+            <img src="res/elpi_down.png" />
+          </button>
         </div>
       </div>
     </div>
@@ -56,7 +62,7 @@
     <button class="ibutton" id="random"><img src="res/elpi_random.png" /></button>
   </div>
   <div id="historybutton-container">
-    <button class="ibutton active" id="historybutton"><img src="res/elpi_help.png" /></button>
+    <button class="ibutton active" id="historybutton"><img src="res/elpi_library.png" /></button>
   </div>
   <img src="res/elpi_logo.png" width="150px" />
 </body>
