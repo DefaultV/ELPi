@@ -52,7 +52,7 @@ const startMPVStream = (searchquery: string) => {
 
   let formattedQuery = searchquery.replace(/[^\w\s]/gi, "");
   mpv_process = spawn(
-    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=no --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`,
+    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`,
     { shell: "/bin/bash" }
   );
 
