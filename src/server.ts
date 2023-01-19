@@ -106,7 +106,7 @@ const playNextInQueue = () => {
 };
 
 const handleStreamOut = (data: string) => {
-  if (data.includes("ERROR")) {
+  if (data.includes("ERROR") || data.includes("Failed")) {
     connectionList.forEach((connection) => connection.send("error"));
     killMPVStream();
     return;

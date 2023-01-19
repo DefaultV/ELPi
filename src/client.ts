@@ -84,8 +84,7 @@ scrubbarElement?.addEventListener("pointerout", (ev) => {
 });
 
 document.getElementById("search")?.addEventListener("click", () => {
-  sendWSQuery(inputField.value);
-  inputField.value = "";
+  submitInputField();
 });
 playElement?.addEventListener("click", () => {
   sendWSPause(false);
@@ -115,6 +114,13 @@ randomizerButton.addEventListener("click", () => {
   specifyClassList(false, randomizerButton, "active");
   specifyClassList(false, historyElement, "active");
 });
+
+const submitInputField = () => {
+  // TODO: Settings menu - https://github.com/DefaultV/ELPi/issues/31
+  sendWSQuery(inputField.value);
+  inputField.value = "";
+  inputField.blur();
+};
 
 let lastQuery = "";
 const sendWSQuery = (query: string) => {
@@ -409,7 +415,7 @@ if (KEY.length == 8) {
 
 inputField.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-    sendWSQuery(inputField.value);
+    submitInputField();
   }
 });
 
