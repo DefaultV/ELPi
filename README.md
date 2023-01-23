@@ -1,6 +1,6 @@
 # ELPi :notes:
 
-Using youtube-dl/yt-dlp and MPV, host your own free audio streaming service locally on the Raspberry Pi.
+Using youtube-dl/yt-dlp and MPV, host your own free audio streaming service locally on the Raspberry Pi (or Unix system).
 
 <p align="center">
   <img width="128" src="https://user-images.githubusercontent.com/14123880/184543425-90f57adf-c123-4138-aec1-b6c349e30eeb.png">
