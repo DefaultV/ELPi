@@ -111,11 +111,17 @@ const handleStreamOut = (data: string) => {
     killMPVStream();
     return;
   }
+
+  if (data.includes("Terminated")) {
+    startMPVStream(MPVStatus().searchQuery);
+  }
+
   if (data.includes("A:")) {
     MPVStatus({
       metadata: data,
     });
   }
+
   if (data.includes("[info]")) {
     const videoId = data.split("[info] ")[1].split(":")[0];
     MPVStatus({
