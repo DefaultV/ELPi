@@ -58,11 +58,39 @@
   <div id="history-outer">
     <div id="history" class="history"></div>
   </div>
+  <div id="settings-outer">
+    <div id="settings" class="settings">
+      <div class="switch-container">
+        <div><b>High quality audio</b><br><i>(Plays the best available quality)</i></div>
+        <label class="switch">
+          <input id="high-quality-checkbox" type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="switch-container">
+        <div><b>Always show suggestions</b><br><i>(Requires API token to be given)</i></div>
+        <label class="switch">
+          <input id="search-api-checkbox" type="checkbox" disabled="true">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="switch-container">
+        <div><b>Faster searching & streaming</b><br><i>(Experimental, scrubbing issues)</i></div>
+        <label class="switch">
+          <input id="faster-streaming-checkbox" type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+  </div>
   <div id="randomizer">
     <button class="ibutton" id="random"><img src="res/elpi_random.png" /></button>
   </div>
   <div id="historybutton-container">
     <button class="ibutton active" id="historybutton"><img src="res/elpi_library.png" /></button>
+  </div>
+  <div id="settingsbutton-container">
+    <button class="ibutton active" id="settingsbutton"><img src="res/elpi_settings.png" /></button>
   </div>
   <img src="res/elpi_logo.png" width="150px" />
 </body>

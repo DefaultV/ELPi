@@ -11,12 +11,26 @@ interface IELPiSongInfo {
   videoId: string;
 }
 
+interface IELPiConfig {
+  searchWithToken: boolean;
+  highQualityAudio: boolean;
+  experimentalLoader: boolean;
+}
+
 interface IAPIResponse {
   items: { id: { videoId: string }; snippet: { title: string } }[];
 }
 
 const socket = new WebSocket(`ws://${location.host.split(":")[0]}:8080`);
 const MAX_STRING_LENGTH = 60;
+
+const eLPiConfig: IELPiConfig = {
+  searchWithToken: false,
+  highQualityAudio: false,
+  experimentalLoader: false,
+};
+
+const KEY = "APITOKEN";
 
 const inputField: HTMLInputElement = document.getElementById(
   "queryinput"
@@ -26,6 +40,9 @@ const loadingElement: HTMLDivElement = document.getElementById(
 ) as HTMLDivElement;
 const historyElement: HTMLDivElement = document.getElementById(
   "history"
+) as HTMLDivElement;
+const settingsElement: HTMLDivElement = document.getElementById(
+  "settings"
 ) as HTMLDivElement;
 const playElement: HTMLButtonElement = document.getElementById(
   "play"
@@ -60,6 +77,9 @@ const searchHelpIcon = document.getElementById("searchhelp");
 const searchHelper = document.getElementById("search-helper") as HTMLDivElement;
 const historybutton = document.getElementById(
   "historybutton"
+) as HTMLButtonElement;
+const settingsbutton = document.getElementById(
+  "settingsbutton"
 ) as HTMLButtonElement;
 const randomizerButton = document.getElementById(
   "randomizer"
@@ -101,6 +121,34 @@ document.getElementById("queue")?.addEventListener("click", () => {
 document.getElementById("searchhelper-close")?.addEventListener("click", () => {
   specifyClassList(false, searchHelper, "active");
 });
+const fastStreamingCheckbox: HTMLInputElement = document.getElementById(
+  "faster-streaming-checkbox"
+) as HTMLInputElement;
+fastStreamingCheckbox?.addEventListener("click", (ev) => {
+  sendWSConfigChange(
+    "experimentalLoader",
+    (ev.target as HTMLInputElement).checked
+  );
+});
+const searchApiCheckbox: HTMLInputElement = document.getElementById(
+  "search-api-checkbox"
+) as HTMLInputElement;
+searchApiCheckbox?.addEventListener("click", (ev) => {
+  sendWSConfigChange(
+    "searchWithToken",
+    (ev.target as HTMLInputElement).checked
+  );
+});
+searchApiCheckbox.disabled = KEY.length == 8;
+const highQualityCheckbox: HTMLInputElement = document.getElementById(
+  "high-quality-checkbox"
+) as HTMLInputElement;
+highQualityCheckbox?.addEventListener("click", (ev) => {
+  sendWSConfigChange(
+    "highQualityAudio",
+    (ev.target as HTMLInputElement).checked
+  );
+});
 searchHelpIcon?.addEventListener("click", () => {
   searchHelpIcon.style.display = "none";
   sendAPIQueryFromString(inputField.value);
@@ -109,15 +157,28 @@ historybutton.addEventListener("click", () => {
   const state = !historyElement.classList.contains("active");
   specifyClassList(state, historyElement, "active");
   specifyClassList(state, randomizerButton, "active");
+
+  specifyClassList(false, settingsElement, "active");
 });
 randomizerButton.addEventListener("click", () => {
+  specifyClassList(false, randomizerButton, "active");
+  specifyClassList(false, historyElement, "active");
+  specifyClassList(false, settingsElement, "active");
+});
+settingsbutton.addEventListener("click", () => {
+  const state = !settingsElement.classList.contains("active");
+  specifyClassList(state, settingsElement, "active");
+
   specifyClassList(false, randomizerButton, "active");
   specifyClassList(false, historyElement, "active");
 });
 
 const submitInputField = () => {
-  // TODO: Settings menu - https://github.com/DefaultV/ELPi/issues/31
-  sendWSQuery(inputField.value);
+  if (eLPiConfig.searchWithToken && KEY.length != 8) {
+    sendAPIQueryFromString(inputField.value);
+  } else {
+    sendWSQuery(inputField.value);
+  }
   inputField.value = "";
   inputField.blur();
 };
@@ -138,6 +199,12 @@ const sendWSStatus = () => {
 };
 const sendWSHistory = () => {
   socket.send("history:all");
+};
+const sendWSConfig = () => {
+  socket.send("config:all");
+};
+const sendWSConfigChange = (option: string, value: boolean) => {
+  socket.send(`config:${option} ${value}`);
 };
 const sendWSPause = (pause: boolean) => {
   socket.send(`pause:${pause}`);
@@ -178,9 +245,14 @@ const getTotalVideoLength = () => {
 };
 
 function isMPVStreamInfo(
-  info: IMPVStreamInfo | IELPiSongInfo[]
+  info: IMPVStreamInfo | IELPiSongInfo[] | IELPiConfig
 ): info is IMPVStreamInfo {
   return (info as IMPVStreamInfo).status !== undefined;
+}
+function isElpiConfigInfo(
+  info: IMPVStreamInfo | IELPiSongInfo[] | IELPiConfig
+): info is IELPiConfig {
+  return (info as IELPiConfig).searchWithToken !== undefined;
 }
 
 const populateHistory = (items: IELPiSongInfo[]) => {
@@ -262,13 +334,28 @@ socket.addEventListener("message", function (event) {
     }
     return;
   }
-  const info: IMPVStreamInfo | IELPiSongInfo[] = JSON.parse(event.data);
+  const info: IMPVStreamInfo | IELPiSongInfo[] | IELPiConfig = JSON.parse(
+    event.data
+  );
   const isMPVInfo = isMPVStreamInfo(info);
 
   if (isMPVInfo) {
     handleOnInfo(info);
   } else {
-    populateHistory(info);
+    const isElpiConfig = isElpiConfigInfo(info);
+    if (isElpiConfig) {
+      Object.assign(eLPiConfig, info);
+
+      highQualityCheckbox.checked = eLPiConfig.highQualityAudio;
+      searchApiCheckbox.checked = eLPiConfig.searchWithToken;
+      fastStreamingCheckbox.checked = eLPiConfig.experimentalLoader;
+
+      if (eLPiConfig.searchWithToken) {
+        searchHelpIcon!.style.display = "none";
+      }
+    } else {
+      populateHistory(info);
+    }
   }
 });
 
@@ -393,10 +480,9 @@ const handleResponse = (resp: IAPIResponse) => {
   searchHelpIcon!.style.display = "block";
 };
 
-const KEY = "APITOKEN";
 const sendAPIQueryFromString = (query: string) => {
   const queryParts = query.split(" ").join("+");
-  const fetchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${queryParts}&key=${KEY}`;
+  const fetchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${queryParts}&key=${KEY}&maxResults=10`;
 
   fetch(fetchUrl, {
     method: "GET",
@@ -422,4 +508,5 @@ inputField.addEventListener("keydown", (event) => {
 socket.addEventListener("open", () => {
   sendWSStatus();
   sendWSHistory();
+  sendWSConfig();
 });
