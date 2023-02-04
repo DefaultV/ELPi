@@ -157,7 +157,7 @@ const handleStreamOut = (data: string) => {
     startMPVStream(MPVStatus().searchQuery);
   }
 
-  if (data.includes("A:")) {
+  if (data.includes("A:") && connectionList.length > 0) {
     MPVStatus({
       metadata: data,
     });
