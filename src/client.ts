@@ -349,6 +349,10 @@ socket.addEventListener("message", function (event) {
       highQualityCheckbox.checked = eLPiConfig.highQualityAudio;
       searchApiCheckbox.checked = eLPiConfig.searchWithToken;
       fastStreamingCheckbox.checked = eLPiConfig.experimentalLoader;
+
+      if (eLPiConfig.searchWithToken) {
+        searchHelpIcon!.style.display = "none";
+      }
     } else {
       populateHistory(info);
     }

@@ -165,8 +165,13 @@ const handleStreamOut = (data: string) => {
 
   if (data.includes("[info]") || data.includes("Playing:")) {
     const videoId = eLPiConfig.experimentalLoader
-      ? data.split("[info] ")[1].split(":")[0].trim()
-      : data.split("=")[1].trim();
+      ? data.split("[info] ")[1].split(":")[0]?.trim()
+      : (data.split("=")[1] || data.split(".be/")[1])?.trim();
+
+    if (!videoId) {
+      return;
+    }
+
     MPVStatus({
       status: "playing",
       videoUrl: videoId,
