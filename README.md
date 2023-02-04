@@ -25,15 +25,15 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 
 :tada: Song queue
 
-:tada: Playback controls (scrubbing + more)
+:tada: Playback controls
 
-:tada: History (quick play + randomize)
+:tada: History
 
-:tada: Realtime playback information for any device
-
-:tada: Synchronized playback information across all connected devices
+:tada: Realtime playback information across all connected devices
 
 :tada: Optionally get search results via API
+
+:tada: Settings menu
 
 :magic_wand: Sleek AI generated visuals
 
