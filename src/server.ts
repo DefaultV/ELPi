@@ -7,7 +7,7 @@ import { writeFile } from "fs";
 
 const wssPort = 8080;
 const wss = new WebSocketServer({ port: wssPort });
-const port = 80;
+const port = 3001;
 const app = express();
 
 interface IMPVStreamInfo {
@@ -23,13 +23,36 @@ interface IELPiSongInfo {
   videoId: string;
 }
 
+interface IELPiConfig {
+  searchWithToken: boolean;
+  highQualityAudio: boolean;
+  experimentalLoader: boolean;
+}
+
 let mpv_process: ChildProcess;
 let mpv_info: IMPVStreamInfo = {
   status: "idle",
   queue: [],
 };
+
+const eLPiConfig: IELPiConfig = {
+  searchWithToken: false,
+  highQualityAudio: false,
+  experimentalLoader: false,
+};
+
 const connectionList: WebSocket[] = [];
 const history: IELPiSongInfo[] = [];
+
+readFile("dist/config", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  if (data) {
+    Object.assign(eLPiConfig, JSON.parse(data));
+  }
+});
 
 readFile("dist/history", "utf8", (err, data) => {
   if (err) {
@@ -41,8 +64,8 @@ readFile("dist/history", "utf8", (err, data) => {
   }
 });
 
-const startMPVStream = (searchquery: string) => {
-  killMPVStream();
+const startMPVStream = async (searchquery: string) => {
+  await killMPVStream();
 
   MPVStatus({
     status: "searching",
@@ -51,14 +74,26 @@ const startMPVStream = (searchquery: string) => {
   });
 
   let formattedQuery = searchquery.replace(/[^\w\s]/gi, "");
+  const audioQuality = eLPiConfig.highQualityAudio ? "bestaudio" : "worstaudio";
   mpv_process = spawn(
-    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`,
+    eLPiConfig.experimentalLoader
+      ? `yt-dlp -f ${audioQuality} ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`
+      : `mpv --ytdl-format=${audioQuality} ytdl://ytsearch:"${formattedQuery}" --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket`,
     { shell: "/bin/bash" }
   );
 
-  mpv_process.stderr.addListener("data", (data) =>
-    handleStreamOut(data.toString())
-  );
+  if (eLPiConfig.experimentalLoader) {
+    mpv_process.stderr.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+  } else {
+    mpv_process.stdout.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+    mpv_process.stderr.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+  }
 
   mpv_process.on("exit", (code) => {
     if (code == 0) {
@@ -68,15 +103,21 @@ const startMPVStream = (searchquery: string) => {
 };
 
 const killMPVStream = () => {
-  MPVStatus({
-    status: "idle",
-    searchQuery: undefined,
-    videoUrl: undefined,
-    metadata: undefined,
+  return new Promise((resolve) => {
+    MPVStatus({
+      status: "idle",
+      searchQuery: undefined,
+      videoUrl: undefined,
+      metadata: undefined,
+    });
+
+    const pKill = spawn(`killall mpv yt-dlp`, { shell: "/bin/bash" });
+    mpv_process?.kill();
+
+    pKill.addListener("exit", () => {
+      resolve(null);
+    });
   });
-  if (!mpv_process) return;
-  spawn(`killall mpv yt-dlp`, { shell: "/bin/bash" });
-  mpv_process.kill();
 };
 
 const handleAddQueryToQueue = (query: string) => {
@@ -122,8 +163,10 @@ const handleStreamOut = (data: string) => {
     });
   }
 
-  if (data.includes("[info]")) {
-    const videoId = data.split("[info] ")[1].split(":")[0];
+  if (data.includes("[info]") || data.includes("Playing:")) {
+    const videoId = eLPiConfig.experimentalLoader
+      ? data.split("[info] ")[1].split(":")[0].trim()
+      : data.split("=")[1].trim();
     MPVStatus({
       status: "playing",
       videoUrl: videoId,
@@ -201,6 +244,20 @@ const handleConnection = (connection: WebSocket) => {
       case "history":
         sendHistoryToSocket(connection);
         break;
+      case "config":
+        if (msgContent && msgContent?.length > 1) {
+          if (msgContent == "all") {
+            sendConfigToSocket(connection);
+          } else {
+            const configSplit = msgContent.split(" ");
+            if (configSplit?.length > 1) {
+              eLPiConfig[configSplit[0]] = configSplit[1] == "true";
+              saveConfig(eLPiConfig);
+              sendConfigToSocket(connection);
+            }
+          }
+        }
+        break;
       case "shutdown":
         exec("shutdown now");
         break;
@@ -221,6 +278,10 @@ const handleConnection = (connection: WebSocket) => {
 
 const sendHistoryToSocket = (connection: WebSocket) => {
   connection.send(JSON.stringify(history));
+};
+
+const sendConfigToSocket = (connection: WebSocket) => {
+  connection.send(JSON.stringify(eLPiConfig));
 };
 
 const arrayContainsObject = <T extends Record<string, unknown>>(
@@ -245,6 +306,14 @@ const addQueryToHistory = (query: string, videoId: string) => {
       }
     });
   }
+};
+
+const saveConfig = (newConfig: IELPiConfig) => {
+  writeFile("dist/config", JSON.stringify(newConfig), (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
 };
 
 wss.on("connection", handleConnection);
