@@ -5,7 +5,8 @@ Using youtube-dl/yt-dlp and MPV, host your own free audio streaming service loca
 <p align="center">
   <img width="128" src="https://user-images.githubusercontent.com/14123880/184543425-90f57adf-c123-4138-aec1-b6c349e30eeb.png">
 </p>
-<br>
+
+---
 
 ## Why would I want this? (And why I made this project) :thinking:
 
@@ -36,6 +37,15 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 :tada: Settings menu
 
 :magic_wand: Sleek AI generated visuals
+
+---
+
+<p align="center">
+  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/211880372-ae73be60-4fd8-4ab5-b16a-0f2f6da41f16.png">
+  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/211881016-23d3bbf3-8061-478c-8129-dd42906127bc.png">
+</p>
+
+---
 
 ### TL;DR
 
@@ -163,11 +173,6 @@ systemctl enable elpi && systemctl start elpi
 ## Conclusion
 
 If everything works as it should, then navigating to the local website and upon searching for a song or inputting a youtube url directly into the search field.
-
-<p align="center">
-  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/211880372-ae73be60-4fd8-4ab5-b16a-0f2f6da41f16.png">
-  <img height="700" hspace="20" src="https://user-images.githubusercontent.com/14123880/211881016-23d3bbf3-8061-478c-8129-dd42906127bc.png">
-</p>
 
 # IMPORTANT
 
