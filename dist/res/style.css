@@ -368,20 +368,26 @@ input[type="submit"]:hover {
 .history-item {
   box-sizing: border-box;
   background: #000000bb;
-  padding: 8px;
   width: 100%;
-  max-width: 300px;
-  border-radius: 6px;
-  overflow-wrap: break-word;
+  max-width: 325px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   display: flex;
-  gap: 8px;
-  outline: 1px solid #ffffff33;
+  align-items: center;
 }
 
-.history-item > p {
+.history-item > div {
+  transition: background 0.2s ease, color 0.2s ease;
+  padding: 8px;
+  border-radius: 6px;
+  overflow-wrap: break-word;
+  outline: 1px solid #ffffff33;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.history-item > div > p {
   text-transform: capitalize;
   color: #fff;
   overflow: hidden;
@@ -393,10 +399,30 @@ input[type="submit"]:hover {
   height: 64px;
 }
 
-.history-item:hover {
+.history-item > div:hover {
   cursor: pointer;
   background: #88221d;
   color: #fff;
+}
+
+.history-item > button {
+  padding: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  opacity: 0.15;
+  margin-left: 16px;
+  transition: color 0.2s ease;
+  background-image: url("elpi_delete.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: opacity 0.2s ease;
+  background-color: #00000000;
+}
+.history-item > button:hover {
+  opacity: 1;
+  background-color: #00000000;
 }
 
 .search-response {

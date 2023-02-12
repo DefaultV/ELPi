@@ -200,6 +200,9 @@ const sendWSStatus = () => {
 const sendWSHistory = () => {
   socket.send("history:all");
 };
+const sendWSDeleteHistoryItem = (value: string) => {
+  socket.send(`history:delete ${value}`);
+};
 const sendWSConfig = () => {
   socket.send("config:all");
 };
@@ -266,6 +269,9 @@ const populateHistory = (items: IELPiSongInfo[]) => {
         sendWSQuery(item.searchTitle);
         specifyClassList(false, historyElement, "active");
         specifyClassList(false, randomizerButton, "active");
+      },
+      () => {
+        sendWSDeleteHistoryItem(item.videoId);
       }
     );
 
@@ -288,19 +294,29 @@ const populateHistory = (items: IELPiSongInfo[]) => {
 const createSongContainer = (
   title: string,
   videoId: string,
-  onContainerClick?: () => void
+  onContainerClick?: () => void,
+  onDelete?: () => void
 ): HTMLDivElement => {
   const songContainer = document.createElement("div");
+  const songParent = document.createElement("div");
   const songImage = document.createElement("img");
   const songText = document.createElement("p");
+  const songDeleteButton = onDelete
+    ? document.createElement("button")
+    : undefined;
 
   songText.innerHTML = title.substring(0, MAX_STRING_LENGTH);
   songContainer.classList.add("history-item");
   songImage.classList.add("history-item-image");
-  songContainer.addEventListener("click", onContainerClick);
+  songParent.addEventListener("click", onContainerClick);
   songImage.src = videoIdToImageUrl(videoId);
-  songContainer.appendChild(songImage);
-  songContainer.appendChild(songText);
+  songParent.appendChild(songImage);
+  songParent.appendChild(songText);
+  songContainer.appendChild(songParent);
+  if (songDeleteButton) {
+    songDeleteButton.addEventListener("click", onDelete);
+    songContainer.appendChild(songDeleteButton);
+  }
 
   return songContainer;
 };
