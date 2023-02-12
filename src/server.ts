@@ -42,7 +42,7 @@ const eLPiConfig: IELPiConfig = {
 };
 
 const connectionList: WebSocket[] = [];
-const history: IELPiSongInfo[] = [];
+let history: IELPiSongInfo[] = [];
 
 readFile("dist/config", "utf8", (err, data) => {
   if (err) {
@@ -247,7 +247,17 @@ const handleConnection = (connection: WebSocket) => {
         forceBroadcastMPVStatus();
         break;
       case "history":
-        sendHistoryToSocket(connection);
+        if (msgContent && msgContent?.length > 1) {
+          if (msgContent == "all") {
+            sendHistoryToSocket(connection);
+          } else if (msgContent.includes("delete")) {
+            const configSplit = msgContent.split(" ");
+            if (configSplit?.length > 1) {
+              removeVideoFromHistory(configSplit[1]);
+              sendHistoryToSocket(connection);
+            }
+          }
+        }
         break;
       case "config":
         if (msgContent && msgContent?.length > 1) {
@@ -305,12 +315,21 @@ const addQueryToHistory = (query: string, videoId: string) => {
   const newHistoryItem = { searchTitle: query, videoId: videoId };
   if (!arrayContainsObject(history, newHistoryItem)) {
     history.push({ searchTitle: query, videoId: videoId });
-    writeFile("dist/history", JSON.stringify(history), (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
+    saveHistory();
   }
+};
+
+const saveHistory = () => {
+  writeFile("dist/history", JSON.stringify(history), (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
+};
+
+const removeVideoFromHistory = (videoId: string) => {
+  history = history.filter((songInfo) => songInfo.videoId != videoId);
+  saveHistory();
 };
 
 const saveConfig = (newConfig: IELPiConfig) => {
