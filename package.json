@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "tsc; node dist/server.js"
+    "build": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc",
+    "dev": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc -w"
   },
   "dependencies": {
     "@types/websocket": "^1.0.5",

@@ -7,7 +7,7 @@ import { writeFile } from "fs";
 
 const wssPort = 8080;
 const wss = new WebSocketServer({ port: wssPort });
-const port = 80;
+const port = 3001;
 const app = express();
 
 interface IMPVStreamInfo {
