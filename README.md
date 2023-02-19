@@ -76,6 +76,17 @@ Enter your API token
 
 #### Running on boot
 
+TL;DR
+```
+echo '#!/bin/bash\ncd /home/pi/ELPi/; sudo node dist/server.min.js' > /home/pi/ELPi/elpi.sh
+echo '[Service]\nType=simple\nRemainAfterExit=yes\nExecStart=/home/pi/ELPi/elpi.sh\nTimeoutStartSec=0\n\n[Install]\nWantedBy=default.target' > /home/pi/ELPi/elpi.service
+sudo chmod +x /home/pi/ELPi/elpi.sh
+sudo mv /home/pi/ELPi/elpi.service /etc/systemd/system/elpi.service
+systemctl enable elpi && systemctl start elpi
+```
+
+OR
+
 Read the [Startup](#startup) section for running on boot.
 
 #### Disclaimer :triangular_flag_on_post:
