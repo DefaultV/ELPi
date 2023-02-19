@@ -74,7 +74,11 @@ cd dist; ./settoken.sh
 Enter your API token
 ```
 
-##### Disclaimer :triangular_flag_on_post:
+#### Running on boot
+
+Read the [Startup](#startup) section for running on boot.
+
+#### Disclaimer :triangular_flag_on_post:
 
 At the current state, this project:
 
@@ -87,7 +91,7 @@ Some values or arguments might differ from Pi to Pi, like the jack audio card in
 
 Please post features in the [Issues](https://github.com/DefaultV/mpvberrypi/issues) tab, prefix issue with `Feature Suggestion:` and label it `feature`
 
-## Instructions
+## Building and repo setup
 
 Your raspberry will be the sole agent in this, any other device will merely be a client. Meaning, the audio will not be streamed from external devices to the pi, the pi itself will be the one playing the audio, all by itself. External devices will only be used to tell the pi what to "search" for, or "play" directly from youtube (Assuming the device has a web-browser)
 
@@ -104,6 +108,7 @@ The following packages are required for the system to work
 `socat`
 `python3-pip`
 `yt-dlp (Through pip3, apt is outdated)`
+`youtube-dl (Through pip3, apt is outdated)`
 
 This can be done with:
 
@@ -120,28 +125,9 @@ sudo pip3 install youtube-dl
 
 For better performance, make sure `nodejs` is somewhat the latest version, the apt version is 10.x
 
-### 2. Setup
+### 2. Building
 
-Either clone the repo or download one of the releases.
-
-#### Release setup
-
-After downloading a release, unzip and run the following command
-
-```
-sudo node dist/server.min.js
-```
-
-Optionally (For API query results)
-
-```
-cd dist; ./settoken.sh
-Enter your API token
-```
-
-#### Repo setup
-
-Clone the repo and run `tsc`, then after compilation you can run the command
+Clone the repo and run `tsc` (having typescript installed), then after compilation you can run the command
 
 ```
 sudo node dist/server.js
@@ -149,9 +135,13 @@ sudo node dist/server.js
 
 That's it! Everything should work now and you should see a webpage when accessing the ip of your Pi on your network.
 
+---
+
+<a name="startup"></a>
+
 ## Startup
 
-If you want, you can run the application on startup. If you are using systemd you can achieve this the following way:
+If you want, you can run the application on startup. If you are using systemd (by default on raspberry pi's) you can achieve this the following way:
 
 `/home/pi/ELPi/elpi.sh`
 
