@@ -53,12 +53,19 @@ A good DIY project to tinker with, and even better, you can host this alongside 
 sudo apt install mpv python3-pip nodejs socat
 sudo pip3 install yt-dlp
 sudo pip3 install youtube-dl
+sudo cp /usr/local/bin/yt-dlp /usr/local/bin/youtube-dl
 mkdir ELPi; cd ELPi
 wget https://github.com/DefaultV/ELPi/releases/download/v1.12/elpi_1.12.zip
 unzip elpi_1.12.zip; rm elpi_1.12.zip
 
 sudo node dist/server.min.js
 ```
+
+⚠️ Here we are replacing the youtube-dl binary with yt-dlp. This is because the MPV stable release on apt does not support linking `yt-dlp` as an alternative.
+
+1. If you're building MPV from source, look into the [alternative downloader path configuration](https://github.com/mpv-player/mpv/commit/93f84b514a741c2001e6603d0304cd4a6ab63c73).
+
+2. If you don't want to do this, you might run into [upload id extraction issues](https://github.com/ytdl-org/youtube-dl/issues?q=is%3Aissue+is%3Aopen+unable+to+extract+uploader+id+). Using the `Experimental faster searching & streaming` setting will allow you to stream without changing binaries, but with it's own cons.
 
 Optionally (For API query results)
 
