@@ -114,7 +114,8 @@ sudo apt install mpv python3-pip nodejs socat
 Then, using pip:
 
 ```
-(sudo) pip3 install yt-dlp
+sudo pip3 install yt-dlp
+sudo pip3 install youtube-dl
 ```
 
 For better performance, make sure `nodejs` is somewhat the latest version, the apt version is 10.x
