@@ -1,6 +1,9 @@
 {
   "scripts": {
-    "build": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc",
+    "uglify": "uglifyjs --compress --mangle toplevel -- dist/client.js > dist/client.min.js; uglifyjs --compress --mangle toplevel -- dist/server.js > dist/server.min.js",
+    "build-dev": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc",
+    "build": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc; bun run uglify",
+    "zip": "rm -rf *.zip; zip -r elpi_$VERSION.zip dist node_modules; zip -d elpi_$VERSION.zip 'node_modules/typescript/*'; zip -d elpi_$VERSION.zip 'node_modules/@types/*'",
     "dev": "rm -rf dist; mkdir dist; cp -r src/resources/* dist/.; tsc -w"
   },
   "dependencies": {

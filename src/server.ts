@@ -77,7 +77,7 @@ const startMPVStream = async (searchquery: string) => {
   const audioQuality = eLPiConfig.highQualityAudio ? "bestaudio" : "worstaudio";
   mpv_process = spawn(
     eLPiConfig.experimentalLoader
-      ? `yt-dlp -f ${audioQuality} ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`
+      ? `yt-dlp -f ${audioQuality} --no-continue ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`
       : `mpv --ytdl-format=${audioQuality} ytdl://ytsearch:"${formattedQuery}" --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket`,
     { shell: "/bin/bash" }
   );
