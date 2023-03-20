@@ -55,8 +55,8 @@ sudo pip3 install yt-dlp
 sudo pip3 install youtube-dl
 sudo cp /usr/local/bin/yt-dlp /usr/local/bin/youtube-dl
 mkdir ELPi; cd ELPi
-wget https://github.com/DefaultV/ELPi/releases/download/v1.12/elpi_1.12.zip
-unzip elpi_1.12.zip; rm elpi_1.12.zip
+wget https://github.com/DefaultV/ELPi/releases/download/v1.13/elpi_1.13.zip
+unzip elpi_1.13.zip; rm elpi_1.13.zip
 
 sudo node dist/server.min.js
 ```
