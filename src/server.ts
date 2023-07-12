@@ -1,14 +1,8 @@
-import { appendFile, readFile } from "fs";
+import { readFile } from "fs";
 import { ChildProcess, exec, spawn } from "child_process";
 import WebSocket, { WebSocketServer } from "ws";
-import express from "express";
-import * as path from "path";
 import { writeFile } from "fs";
-
-const wssPort = 8080;
-const wss = new WebSocketServer({ port: wssPort });
 const port = 80;
-const app = express();
 
 interface IMPVStreamInfo {
   status?: "idle" | "searching" | "playing" | "buffering" | "paused";
@@ -163,54 +157,46 @@ const handleSetPause = (pause: boolean) => {
   MPVStatus({ status: pause ? "paused" : "playing" });
 };
 
-const handleConnection = (connection: WebSocket) => {
-  connectionList.push(connection);
-  connection.on("close", (socket: WebSocket) => {
-    connectionList.splice(connectionList.indexOf(socket), 1);
-  });
-  connection.on("message", (data, isBinary) => {
-    const message = isBinary ? data : data.toString();
-    const isString = message instanceof String || typeof message === "string";
-    const split = isString ? message.split(":") : null;
-    if (!split) return;
+const handleConnection = (connection: WebSocket, message: string) => {
+  const split = message.split(":");
+  if (!split) return;
 
-    const msgType = split[0];
-    const msgContent = split.length > 2 ? split[1] + split[2] : split[1];
+  const msgType = split[0];
+  const msgContent = split.length > 2 ? split[1] + split[2] : split[1];
 
-    switch (msgType) {
-      case "play":
-        if (msgContent && msgContent?.length > 1) {
-          startMPVStream(msgContent);
-        }
-        clearQueue();
-        break;
-      case "status":
-        connection.send(JSON.stringify(MPVStatus()));
-        break;
-      case "kill":
-        killMPVStream();
-        playNextInQueue();
-        forceBroadcastMPVStatus();
-        break;
-      case "history":
-        sendHistoryToSocket(connection);
-        break;
-      case "shutdown":
-        exec("shutdown now");
-        break;
-      case "index":
-        handleSetIndex(parseFloat(msgContent));
-        break;
-      case "pause":
-        handleSetPause(msgContent === "true");
-        break;
-      case "queue":
-        if (msgContent && msgContent?.length > 1)
-          handleAddQueryToQueue(msgContent);
-        forceBroadcastMPVStatus();
-        break;
-    }
-  });
+  switch (msgType) {
+    case "play":
+      if (msgContent && msgContent?.length > 1) {
+        startMPVStream(msgContent);
+      }
+      clearQueue();
+      break;
+    case "status":
+      connection.send(JSON.stringify(MPVStatus()));
+      break;
+    case "kill":
+      killMPVStream();
+      playNextInQueue();
+      forceBroadcastMPVStatus();
+      break;
+    case "history":
+      sendHistoryToSocket(connection);
+      break;
+    case "shutdown":
+      exec("shutdown now");
+      break;
+    case "index":
+      handleSetIndex(parseFloat(msgContent));
+      break;
+    case "pause":
+      handleSetPause(msgContent === "true");
+      break;
+    case "queue":
+      if (msgContent && msgContent?.length > 1)
+        handleAddQueryToQueue(msgContent);
+      forceBroadcastMPVStatus();
+      break;
+  }
 };
 
 const sendHistoryToSocket = (connection: WebSocket) => {
@@ -241,12 +227,34 @@ const addQueryToHistory = (query: string, videoId: string) => {
   }
 };
 
-wss.on("connection", handleConnection);
+Bun.serve({
+  websocket: {
+    message(ws, msg) {
+      if (typeof msg == "string") {
+        handleConnection(ws, msg);
+        // handleSocketMessage(ws, msg);
+      }
+    },
+    open(ws) {
+      connectionList.push(ws);
+    },
+    close(ws) {
+      connectionList.splice(connectionList.indexOf(ws), 1);
+    },
+  },
+  fetch(req, server) {
+    if (server.upgrade(req)) {
+      return;
+    }
 
-app.use(express.static("dist"));
-app.all("/", function (request, response) {
-  response.sendFile(path.join(__dirname, "index.html"));
-});
-app.listen(port, () => {
-  console.log(`Listening on ${port} 🚀`);
+    const path = req.url.split("/") as string[];
+    const item = path.slice(3, path.length);
+    const filepath = "dist/" + item.join("/");
+    if (item[0] == "") {
+      return new Response(Bun.file("dist/index.html"));
+    } else {
+      return new Response(Bun.file(filepath));
+    }
+  },
+  port: port,
 });
