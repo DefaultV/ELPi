@@ -17,13 +17,36 @@ interface IELPiSongInfo {
   videoId: string;
 }
 
+interface IELPiConfig {
+  searchWithToken: boolean;
+  highQualityAudio: boolean;
+  experimentalLoader: boolean;
+}
+
 let mpv_process: ChildProcess;
 let mpv_info: IMPVStreamInfo = {
   status: "idle",
   queue: [],
 };
+
+const eLPiConfig: IELPiConfig = {
+  searchWithToken: false,
+  highQualityAudio: false,
+  experimentalLoader: false,
+};
+
 const connectionList: WebSocket[] = [];
-const history: IELPiSongInfo[] = [];
+let history: IELPiSongInfo[] = [];
+
+readFile("dist/config", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  if (data) {
+    Object.assign(eLPiConfig, JSON.parse(data));
+  }
+});
 
 readFile("dist/history", "utf8", (err, data) => {
   if (err) {
@@ -35,8 +58,8 @@ readFile("dist/history", "utf8", (err, data) => {
   }
 });
 
-const startMPVStream = (searchquery: string) => {
-  killMPVStream();
+const startMPVStream = async (searchquery: string) => {
+  await killMPVStream();
 
   MPVStatus({
     status: "searching",
@@ -45,14 +68,26 @@ const startMPVStream = (searchquery: string) => {
   });
 
   let formattedQuery = searchquery.replace(/[^\w\s]/gi, "");
+  const audioQuality = eLPiConfig.highQualityAudio ? "bestaudio" : "worstaudio";
   mpv_process = spawn(
-    `yt-dlp -f bestaudio ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=no --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`,
+    eLPiConfig.experimentalLoader
+      ? `yt-dlp -f ${audioQuality} --no-continue ytsearch:'${formattedQuery}' -o - | mpv --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket -`
+      : `mpv --ytdl-format=${audioQuality} ytdl://ytsearch:"${formattedQuery}" --demuxer-readahead-secs=3 --demuxer-max-bytes=3MiB --demuxer-max-back-bytes=3MiB --force-seekable=yes --cache=yes --audio-device=alsa/plughw:CARD=Headphones,DEV=0 --input-ipc-server=~/socket`,
     { shell: "/bin/bash" }
   );
 
-  mpv_process.stderr.addListener("data", (data) =>
-    handleStreamOut(data.toString())
-  );
+  if (eLPiConfig.experimentalLoader) {
+    mpv_process.stderr.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+  } else {
+    mpv_process.stdout.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+    mpv_process.stderr.addListener("data", (data) =>
+      handleStreamOut(data.toString())
+    );
+  }
 
   mpv_process.on("exit", (code) => {
     if (code == 0) {
@@ -62,15 +97,21 @@ const startMPVStream = (searchquery: string) => {
 };
 
 const killMPVStream = () => {
-  MPVStatus({
-    status: "idle",
-    searchQuery: undefined,
-    videoUrl: undefined,
-    metadata: undefined,
+  return new Promise((resolve) => {
+    MPVStatus({
+      status: "idle",
+      searchQuery: undefined,
+      videoUrl: undefined,
+      metadata: undefined,
+    });
+
+    const pKill = spawn(`killall mpv yt-dlp`, { shell: "/bin/bash" });
+    mpv_process?.kill();
+
+    pKill.addListener("exit", () => {
+      resolve(null);
+    });
   });
-  if (!mpv_process) return;
-  spawn(`killall mpv yt-dlp`, { shell: "/bin/bash" });
-  mpv_process.kill();
 };
 
 const handleAddQueryToQueue = (query: string) => {
@@ -100,18 +141,31 @@ const playNextInQueue = () => {
 };
 
 const handleStreamOut = (data: string) => {
-  if (data.includes("ERROR")) {
+  if (data.includes("ERROR") || data.includes("Failed")) {
     connectionList.forEach((connection) => connection.send("error"));
     killMPVStream();
     return;
   }
-  if (data.includes("A:")) {
+
+  if (data.includes("Terminated")) {
+    startMPVStream(MPVStatus().searchQuery);
+  }
+
+  if (data.includes("A:") && connectionList.length > 0) {
     MPVStatus({
       metadata: data,
     });
   }
-  if (data.includes("[info]")) {
-    const videoId = data.split("[info] ")[1].split(":")[0];
+
+  if (data.includes("[info]") || data.includes("Playing:")) {
+    const videoId = eLPiConfig.experimentalLoader
+      ? data.split("[info] ")[1].split(":")[0]?.trim()
+      : (data.split("=")[1] || data.split(".be/")[1])?.trim();
+
+    if (!videoId) {
+      return;
+    }
+
     MPVStatus({
       status: "playing",
       videoUrl: videoId,
@@ -180,7 +234,31 @@ const handleConnection = (connection: WebSocket, message: string) => {
       forceBroadcastMPVStatus();
       break;
     case "history":
-      sendHistoryToSocket(connection);
+      if (msgContent && msgContent?.length > 1) {
+        if (msgContent == "all") {
+          sendHistoryToSocket(connection);
+        } else if (msgContent.includes("delete")) {
+          const configSplit = msgContent.split(" ");
+          if (configSplit?.length > 1) {
+            removeVideoFromHistory(configSplit[1]);
+            sendHistoryToSocket(connection);
+          }
+        }
+      }
+      break;
+    case "config":
+      if (msgContent && msgContent?.length > 1) {
+        if (msgContent == "all") {
+          sendConfigToSocket(connection);
+        } else {
+          const configSplit = msgContent.split(" ");
+          if (configSplit?.length > 1) {
+            eLPiConfig[configSplit[0]] = configSplit[1] == "true";
+            saveConfig(eLPiConfig);
+            sendConfigToSocket(connection);
+          }
+        }
+      }
       break;
     case "shutdown":
       exec("shutdown now");
@@ -203,6 +281,10 @@ const sendHistoryToSocket = (connection: WebSocket) => {
   connection.send(JSON.stringify(history));
 };
 
+const sendConfigToSocket = (connection: WebSocket) => {
+  connection.send(JSON.stringify(eLPiConfig));
+};
+
 const arrayContainsObject = <T extends Record<string, unknown>>(
   array: T[],
   object: T
@@ -219,12 +301,29 @@ const addQueryToHistory = (query: string, videoId: string) => {
   const newHistoryItem = { searchTitle: query, videoId: videoId };
   if (!arrayContainsObject(history, newHistoryItem)) {
     history.push({ searchTitle: query, videoId: videoId });
-    writeFile("dist/history", JSON.stringify(history), (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
+    saveHistory();
   }
+};
+
+const saveHistory = () => {
+  writeFile("dist/history", JSON.stringify(history), (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
+};
+
+const removeVideoFromHistory = (videoId: string) => {
+  history = history.filter((songInfo) => songInfo.videoId != videoId);
+  saveHistory();
+};
+
+const saveConfig = (newConfig: IELPiConfig) => {
+  writeFile("dist/config", JSON.stringify(newConfig), (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
 };
 
 Bun.serve({

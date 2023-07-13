@@ -58,7 +58,6 @@ body {
   flex-direction: column;
   width: 100%;
   align-items: center;
-  overflow: hidden;
   margin: 0;
   border: 0;
   -webkit-transition: background-image 0.4s ease-in-out;
@@ -286,12 +285,25 @@ input[type="submit"]:hover {
   opacity: 1;
 }
 
-.history.active {
+.switch-container {
+  color: #fff;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.switch-container > div > i {
+  color: #bbb;
+}
+
+.history.active,
+.settings.active {
   opacity: 1;
   pointer-events: all;
 }
 
-.history {
+.history,
+.settings {
   pointer-events: none;
   display: flex;
   position: absolute;
@@ -316,15 +328,22 @@ input[type="submit"]:hover {
   transition: opacity 0.5s ease;
 }
 
-#historybutton {
+.settings {
+  gap: 16px;
+}
+
+#historybutton,
+#settingsbutton {
   pointer-events: all;
   width: 53px;
   height: 53px;
 }
-#historybutton > img {
+#historybutton > img,
+#settingsbutton > img {
   width: 100%;
 }
-#historybutton-container {
+#historybutton-container,
+#settingsbutton-container {
   position: absolute;
   box-sizing: border-box;
   display: flex;
@@ -337,23 +356,38 @@ input[type="submit"]:hover {
   z-index: 2;
 }
 
+#settingsbutton-container {
+  right: 18px;
+  bottom: 100px;
+  opacity: 0.2;
+}
+#settingsbutton-container:hover {
+  opacity: 1;
+}
+
 .history-item {
   box-sizing: border-box;
   background: #000000bb;
-  padding: 8px;
   width: 100%;
-  max-width: 300px;
-  border-radius: 6px;
-  overflow-wrap: break-word;
+  max-width: 325px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   display: flex;
-  gap: 8px;
-  outline: 1px solid #ffffff33;
+  align-items: center;
 }
 
-.history-item > p {
+.history-item > div {
+  transition: background 0.2s ease, color 0.2s ease;
+  padding: 8px;
+  border-radius: 6px;
+  overflow-wrap: break-word;
+  outline: 1px solid #ffffff33;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.history-item > div > p {
   text-transform: capitalize;
   color: #fff;
   overflow: hidden;
@@ -365,10 +399,30 @@ input[type="submit"]:hover {
   height: 64px;
 }
 
-.history-item:hover {
+.history-item > div:hover {
   cursor: pointer;
   background: #88221d;
   color: #fff;
+}
+
+.history-item > button {
+  padding: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  opacity: 0.15;
+  margin-left: 16px;
+  transition: color 0.2s ease;
+  background-image: url("elpi_delete.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: opacity 0.2s ease;
+  background-color: #00000000;
+}
+.history-item > button:hover {
+  opacity: 1;
+  background-color: #00000000;
 }
 
 .search-response {
@@ -546,4 +600,72 @@ input[type="submit"]:hover {
 #searchhelper-close > img {
   width: 100%;
   height: 100%;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #666;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #88221d;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #88221d;
+}
+
+input:disabled + .slider:before,
+input:disabled + .slider {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
